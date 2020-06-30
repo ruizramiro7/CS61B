@@ -49,8 +49,13 @@ public class IntList {
      * @return The element at [position]
      */
     public int get(int position) {
-        // YOUR CODE HERE
-        return -1;
+        if (position == 0){
+            return item;
+        }
+        if (this.next == null){
+            throw new IllegalArgumentException("Index out of bounds");
+        }
+        return next.get(position -1);
     }
 
     /**
@@ -60,8 +65,12 @@ public class IntList {
      * @return The String representation of the list.
      */
     public String toString() {
+        if (this.next == null){
+            return Integer.toString(item);
+        }
+        return this.item + " " + this.next.toString();
+
         // YOUR CODE HERE
-        return null;
     }
 
     /**
@@ -71,8 +80,21 @@ public class IntList {
      * @return Whether the two lists are equal.
      */
     public boolean equals(Object obj) {
-        // YOUR CODE HERE
-        return false;
+        if (!(obj instanceof IntList)){
+            return false;
+        }
+        IntList objList = (IntList) obj;
+        IntList L;
+        for (L =this; L != null && objList != null; L = L.next, objList = objList.next) {
+            if (L.item != objList.item) {
+                return false;
+            }
+        }
+        if (L == null && objList == null ) {
+            return true;
+        }else{
+            return false;
+        }
     }
 
     /**
@@ -81,6 +103,11 @@ public class IntList {
      * @param value, the int to be added.
      */
     public void add(int value) {
+        if (this.next == null){
+            this.next = new IntList(value);
+            return;
+        }
+        this.next.add(value);
         // YOUR CODE HERE
     }
 
@@ -90,8 +117,15 @@ public class IntList {
      * @return smallest element in the list
      */
     public int smallest() {
+        IntList L;
+        int smallest = this.item;
+        for (L = this; L != null; L = L.next ){
+            if (L.item <= smallest) {
+                smallest = L.item;
+            }
+        }
         // YOUR CODE HERE
-        return -1;
+        return smallest;
     }
 
     /**
@@ -100,8 +134,13 @@ public class IntList {
      * @return The sum of squares of all elements.
      */
     public int squaredSum() {
+        int total = 0;
+        IntList L;
+        for (L = this; L != null; L = L.next){
+            total += L.item * L.item;
+        }
         // YOUR CODE HERE
-        return -1;
+        return total;
     }
 
     /**
@@ -158,8 +197,12 @@ public class IntList {
      * @return new list with A followed by B.
      */
     public static IntList dcatenate(IntList A, IntList B) {
+        if (A == null){
+            return B;
+        }
+        A.next = dcatenate(A.next, B);
         // YOUR CODE HERE
-        return null;
+        return A;
     }
 
     /**
@@ -171,7 +214,10 @@ public class IntList {
      * @return new list with A followed by B.
      */
      public static IntList catenate(IntList A, IntList B) {
+         if (A == null){
+             return B;
+         }
         // YOUR CODE HERE
-         return null;
+         return new IntList(A.item, catenate(A.next,B));
      }
 }
