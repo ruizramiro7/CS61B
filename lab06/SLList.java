@@ -119,10 +119,42 @@ public class SLList {
     /** Adds x to the list at the specified index. */
     public void add(int index, int x) {
         // TODO
+        IntListNode prev = sentinel;
+        IntListNode curr = sentinel.next;
+        while (index > 0 && curr != sentinel) {
+            index -= 1;
+            prev = curr;
+            curr = curr.next;
+        }
+        prev.next = new IntListNode(x, curr);
+        size += 1;
+    }
+
+    private IntListNode reverseHelper(IntListNode L) {
+        // Base case: either 0 or 1 nodes left
+        if (L.next == sentinel) {
+            // The base case means the new first node so sentinel should point to it
+            sentinel.next = L;
+            return L;
+        }
+        // Current reversed list (leap of faith),
+        // e.g. [L, 3, 5] becomes L=[L] and temp=[5, 3]
+        IntListNode temp = reverseHelper(L.next);
+        // Get the last node in the reversed list, e.g. [3]
+        IntListNode last = temp;
+        while (last.next != sentinel) {
+            last = last.next;
+        }
+        // Set the last node to point to this node, e.g. [3]->[L]
+        last.next = L;
+        // Set this node to point to sentinel, e.g. [L]->[sentinel]
+        L.next = sentinel;
+        return temp;
     }
 
     /** Destructively reverses this list. */
     public void reverse() {
         // TODO
+        reverseHelper(sentinel.next);
     }
 }
