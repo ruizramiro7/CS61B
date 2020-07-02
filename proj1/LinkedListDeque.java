@@ -5,7 +5,7 @@
  * @author Ramiro Ruiz
  * @author Brandon Bizzarro
  */
-public class LinkedListDeque<T> {
+public class LinkedListDeque<T> implements Deque<T> {
 
     private static class LinkedListNode<T> {
         public T item;
@@ -58,16 +58,8 @@ public class LinkedListDeque<T> {
     }
 
     /**
-     * Returns true if this deque is empty and false otherwise.
-     * @return true if deque is empty and false otherwise.
-     */
-    public boolean isEmpty() {
-        return front.next == front;
-    }
-
-    /**
-     * Returns the number of items in the list.
-     * @return
+     * Returns the number of items in the deque.
+     * @return an integer representing the number of items in the deque.
      */
     public int size() {
         return this.size;
@@ -87,7 +79,7 @@ public class LinkedListDeque<T> {
 
     /**
      * Removes the first item in the deque. If no such item exists, returns null.
-     * @return
+     * @return the value contained in the item that was removed.
      */
     public T removeFirst() {
         if (front.next == front) {
@@ -104,7 +96,7 @@ public class LinkedListDeque<T> {
 
     /**
      * Removes the last item in the deque. If no such item exists, returns null.
-     * @return
+     * @return the value contained in the item that was removed.
      */
     public T removeLast() {
         if (front.next == front) {
@@ -123,8 +115,8 @@ public class LinkedListDeque<T> {
      * Gets the item at the given index, where 0 is the front,
      * 1 is the next item and so on. If no such item exists, returns null.
      * Does not alter the deque.
-     * @param index
-     * @return
+     * @param index integer representing the numerical location of item in deque.
+     * @return the value of type T at the indexed location in the deque.
      */
     public T get(int index) {
         LinkedListNode<T> n = front.next;
