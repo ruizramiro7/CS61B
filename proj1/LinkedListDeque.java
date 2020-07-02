@@ -1,17 +1,31 @@
 /**
- *
- * @param <T>
+ * Represents a doubly-linked list implementation of a deque.
+ * Designed to ensure constant time item insertion at the beginning
+ * and end of the deque.
+ * @param <T> Object type
  * @source https://cs61bl.org/su20/projects/deques/
  * @author Ramiro Ruiz
  * @author Brandon Bizzarro
  */
 public class LinkedListDeque<T> implements Deque<T> {
 
+    /**
+     * Represents the nodes of the linked-list.
+     * Contains and item of type T and references
+     * to the previous and next node.
+     * @param <T> Object Type
+     */
     private static class LinkedListNode<T> {
         public T item;
         public LinkedListNode<T> prev;
         public LinkedListNode<T> next;
 
+        /**
+         *
+         * @param item The object of type T contained in the node
+         * @param prev A reference to the previous node in the linked-list.
+         * @param next A reference to the next node in the linked-list.
+         */
         public LinkedListNode(T item, LinkedListNode<T> prev, LinkedListNode<T> next) {
             this.item = item;
             this.prev = prev;
@@ -23,19 +37,12 @@ public class LinkedListDeque<T> implements Deque<T> {
     private int size;
 
     public LinkedListDeque() {
-        // Front is always a sentinel
+        // Front represents the sentinel which contains a null throwaway value.
         front = new LinkedListNode<T>(null, null, null);
+        // Set the front node to point forward and backward to itself.
         front.next = front;
         front.prev = front;
         size = 0;
-    }
-
-    private LinkedListDeque<T> of(T... items) {
-        LinkedListDeque<T> deque = new LinkedListDeque<T>();
-        for (T item: items) {
-            deque.addLast(item);
-        }
-        return deque;
     }
 
     /**
@@ -43,7 +50,10 @@ public class LinkedListDeque<T> implements Deque<T> {
      * @param item Object of type T to add to the deque.
      */
     public void addFirst(T item) {
-        front.next = new LinkedListNode<T>(item, front, front.next);
+        // Set first node to point backward to new first node containing ITEM.
+        front.next.prev = new LinkedListNode<T>(item, front, front.next);
+        // Set front to point forward to new first node.
+        front.next = front.next.prev;
         size += 1;
     }
 
@@ -52,7 +62,9 @@ public class LinkedListDeque<T> implements Deque<T> {
      * @param item Object of Type T to add to the deque.
      */
     public void addLast(T item) {
+        // Set the last node to point forward to a new node containing ITEM.
         front.prev.next = new LinkedListNode<T>(item, front.prev, front);
+        // Set the front node to point backward to the new last node.
         front.prev = front.prev.next;
         size += 1;
     }
@@ -82,12 +94,15 @@ public class LinkedListDeque<T> implements Deque<T> {
      * @return the value contained in the item that was removed.
      */
     public T removeFirst() {
-        if (front.next == front) {
+        if (isEmpty()) {
             return null;
         }
         else {
+            // Save value contained in item to remove in a temporary variable.
             T value = front.next.item;
+            // Set front to point forward to the second node in the list.
             front.next = front.next.next;
+            // Set the new first node to point backward to front.
             front.next.prev = front;
             size -= 1;
             return value;
@@ -99,12 +114,15 @@ public class LinkedListDeque<T> implements Deque<T> {
      * @return the value contained in the item that was removed.
      */
     public T removeLast() {
-        if (front.next == front) {
+        if (isEmpty()) {
             return null;
         }
         else {
+            // Save value contained in item to remove in a temporary variable.
             T value = front.prev.item;
+            // Set the front node to point backward to the second to last node.
             front.prev = front.prev.prev;
+            // Set the new last node to point forward to front.
             front.prev.next = front;
             size -= 1;
             return value;
