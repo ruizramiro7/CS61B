@@ -4,6 +4,16 @@ import static org.junit.Assert.*;
 /** Performs some basic linked list tests. */
 public class LinkedListDequeTest {
 
+    @Test
+    public void addFirstTest() {
+
+    }
+
+    @Test
+    public void addLastTest() {
+
+    }
+
     /** Adds a few things to the deque, checking isEmpty() and size() are correct,
      * finally printing the results. */
     @Test
