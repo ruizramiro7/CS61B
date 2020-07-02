@@ -9,24 +9,24 @@ public class LinkedListDeque<T> {
 
     private static class LinkedListNode<T> {
         public T item;
+        public LinkedListNode<T> prev;
         public LinkedListNode<T> next;
 
-        public LinkedListNode(T item, LinkedListNode<T> next) {
+        public LinkedListNode(T item, LinkedListNode<T> prev, LinkedListNode<T> next) {
             this.item = item;
+            this.prev = prev;
             this.next = next;
         }
     }
 
     private LinkedListNode<T> front;
-    private LinkedListNode<T> back;
     private int size;
 
     public LinkedListDeque() {
         // Front is always a sentinel
-        front = new LinkedListNode<T>(null, null);
-        //back = new LinkedListNode<T>(null, null);
-        back = front;
-        front.next = back;
+        front = new LinkedListNode<T>(null, null, null);
+        front.next = front;
+        front.prev = front;
         size = 0;
     }
 
@@ -43,7 +43,8 @@ public class LinkedListDeque<T> {
      * @param item Object of type T to add to the deque.
      */
     public void addFirst(T item) {
-        front.next = new LinkedListNode(item, front.next);
+        front.next = new LinkedListNode<T>(item, front, front.next);
+        size += 1;
     }
 
     /**
@@ -51,7 +52,9 @@ public class LinkedListDeque<T> {
      * @param item Object of Type T to add to the deque.
      */
     public void addLast(T item) {
-        back = new LinkedListNode(item, front);
+        front.prev.next = new LinkedListNode<T>(item, front.prev, front);
+        front.prev = front.prev.next;
+        size += 1;
     }
 
     /**
@@ -59,7 +62,7 @@ public class LinkedListDeque<T> {
      * @return true if deque is empty and false otherwise.
      */
     public boolean isEmpty() {
-        return true;
+        return front.next == front;
     }
 
     /**
@@ -67,14 +70,19 @@ public class LinkedListDeque<T> {
      * @return
      */
     public int size() {
-        return 0;
+        return this.size;
     }
 
     /**
      * Prints the items in the deque from first to last, separated by a space.
      */
     public void printDeque() {
-
+        LinkedListNode<T> n = front.next;
+        while (n.next != front) {
+            System.out.print(n.item + " ");
+            n = n.next;
+        }
+        System.out.println(n.item);
     }
 
     /**
@@ -82,7 +90,15 @@ public class LinkedListDeque<T> {
      * @return
      */
     public T removeFirst() {
-        return null;
+        if (front.next == front) {
+            return null;
+        }
+        else {
+            T value = front.next.item;
+            front.next = front.next.next;
+            front.next.prev = front;
+            return value;
+        }
     }
 
     /**
@@ -90,7 +106,15 @@ public class LinkedListDeque<T> {
      * @return
      */
     public T removeLast() {
-        return null;
+        if (front.next == front) {
+            return null;
+        }
+        else {
+            T value = front.prev.item;
+            front.prev = front.prev.prev;
+            front.prev.next = front;
+            return value;
+        }
     }
 
     /**
@@ -101,7 +125,22 @@ public class LinkedListDeque<T> {
      * @return
      */
     public T get(int index) {
-        return null;
+        LinkedListNode<T> n = front.next;
+        for (int i = 0; i != index; ++i) {
+            if (n == front) {
+                return null;
+            }
+            n = n.next;
+        }
+        return n.item;
+    }
+
+    private LinkedListNode<T> getRecHelper(int index, LinkedListNode<T> n) {
+        // front.item = null anyways so it still returns null when no such item exits.
+        if (index <= 0 || n == front) {
+            return n;
+        }
+        return getRecHelper(index - 1, n.next);
     }
 
     /**
@@ -110,7 +149,7 @@ public class LinkedListDeque<T> {
      * @return
      */
     public T getRecursive(int index) {
-        return null;
+        return getRecHelper(index, front.next).item;
     }
 
 }

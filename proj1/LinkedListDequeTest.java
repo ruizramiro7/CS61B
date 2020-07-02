@@ -6,12 +6,32 @@ public class LinkedListDequeTest {
 
     @Test
     public void addFirstTest() {
-
+        LinkedListDeque<String> test = new LinkedListDeque<>();
+        test.addFirst("item0");
+        assertEquals(1, test.size());
+        assertEquals("item0", test.get(0));
+        test.addFirst("item1");
+        assertEquals(2, test.size());
+        assertEquals("item1", test.get(0));
     }
 
     @Test
     public void addLastTest() {
+        LinkedListDeque<String> test = new LinkedListDeque<>();
+        test.addLast("item0");
+        assertEquals(1, test.size());
+        assertEquals("item0", test.get(0));
+        test.addLast("item1");
+        assertEquals(2, test.size());
+        assertEquals("item1", test.get(1));
+    }
 
+    @Test
+    public void getRecursiveTest() {
+        LinkedListDeque<String> test = new LinkedListDeque<>();
+        test.addLast("item0");
+        assertEquals(1, test.size());
+        assertEquals("item0", test.getRecursive(0));
     }
 
     /** Adds a few things to the deque, checking isEmpty() and size() are correct,
@@ -20,7 +40,7 @@ public class LinkedListDequeTest {
     public void addIsEmptySizeTest() {
         System.out.println("Running add/isEmpty/Size test.");
         System.out.println("Make sure to uncomment the lines below (and delete this line).");
-        /*
+
         LinkedListDeque<String> lld1 = new LinkedListDeque<>();
 
         // Java will try to run the below code.
@@ -46,7 +66,7 @@ public class LinkedListDequeTest {
             System.out.println("Printing out deque: ");
             lld1.printDeque();
         }
-        */
+
     }
 
     /** Adds an item, then removes an item, and ensures that deque is empty afterwards. */
@@ -54,7 +74,7 @@ public class LinkedListDequeTest {
     public void addRemoveTest() {
         System.out.println("Running add/remove test.");
         System.out.println("Make sure to uncomment the lines below (and delete this line).");
-        /*
+
         LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
 
         try {
@@ -69,6 +89,6 @@ public class LinkedListDequeTest {
             System.out.println("Printing out deque: ");
             lld1.printDeque();
         }
-        */
+
     }
 }
