@@ -1,33 +1,29 @@
 /**
- * @param <T>
+ * Implements a deque structure with constant-time insertion at front and back
+ * using the generic java array as the core data structure.
+ * @param <T> Object Type
  * @author Ramiro Ruiz
  * @author Brandon Bizzarro
  * @source https://cs61bl.org/su20/projects/deques/
  */
-public class ArrayDeque<T> {
+public class ArrayDeque<T> implements Deque<T>{
+    private static final int INIT_CAPACITY = 8;
+    private static final int RESIZE_FACTOR = 2;
+    private static final double USAGE_LIMIT = (double)1 / (double)4;
     private T[] items;
     private int size;
     private int first;
     private int last;
 
     public ArrayDeque() {
-        items = (T[]) new Object[8];
+        items = (T[]) new Object[INIT_CAPACITY];
         first = 0;
         last = 0;
-    }
-
-    public ArrayDeque(ArrayDeque other) {
-        size = 0;
-        items = (T[]) new Object[other.size()];
-        first = 0;
-        last = 0;
-        for (int i = 0; i < other.size(); i++) {
-            addLast((T) other.get(i));
-        }
     }
 
     /**
-     * adds item to front of array.
+     * Adds item to front of array.
+     * @param item Object of type T to add to the deque.
      */
     public void addFirst(T item) {
         if (size == 0) {
@@ -36,7 +32,7 @@ public class ArrayDeque<T> {
         } else {
             first = minusOne(first);
             if (items.length == size) {
-                upresize(items.length * 2);
+                upresize(items.length * RESIZE_FACTOR);
             }
             items[first] = item;
             size++;
@@ -44,7 +40,8 @@ public class ArrayDeque<T> {
     }
 
     /**
-     * adds item to end of the list
+     * Adds item to end of the list.
+     * @param item Object of Type T to add to the deque.
      */
     public void addLast(T item) {
         if (size == 0) {
@@ -53,7 +50,7 @@ public class ArrayDeque<T> {
         } else {
             last = plusOne(last);
             if ((items.length == size)) {
-                upresize(items.length * 2);
+                upresize(items.length * RESIZE_FACTOR);
             }
             size++;
             items[last] = item;
@@ -61,7 +58,7 @@ public class ArrayDeque<T> {
     }
 
     /**
-     * add an empty thing in the set
+     * Add an empty thing in the set.
      */
     private void addEmpty(T item) {
         first = 0;
@@ -70,7 +67,7 @@ public class ArrayDeque<T> {
     }
 
     /**
-     * helper function for when adding an item
+     * Helper function for when adding an item.
      */
     private int plusOne(int index) {
         if (index + 1 == items.length) {
@@ -82,32 +79,27 @@ public class ArrayDeque<T> {
     }
 
     /**
-     * checks if array is empty
-     */
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
-    /**
-     * returns size of array
+     * Returns size of array.
+     * @return an integer representing the number of items in the deque.
      */
     public int size() {
         return size;
     }
 
     /**
-     * Prints out array deque
+     * Prints out array deque.
      */
     public void printDeque() {
-        for (int x = 0; x < size; x++) {
-            System.out.print(get(x));
-            System.out.print(" ");
+        // Stops just before last item to prevent extra " "
+        for (int x = 0; x < size - 1; x++) {
+            System.out.print(get(x) + " ");
         }
-        System.out.println();
+        System.out.println(get(size - 1));
     }
 
     /**
-     * removes first item for the array
+     * Removes first item for the array.
+     * @return the value contained in the item that was removed.
      */
     public T removeFirst() {
         if (size == 0) {
@@ -117,8 +109,8 @@ public class ArrayDeque<T> {
             items[first] = null;
             first = plusOne(first);
             size--;
-            if (items.length / 4 == size && size > 8) {
-                downresize(items.length / 2);
+            if (items.length * USAGE_LIMIT == size && size > INIT_CAPACITY) {
+                downresize(items.length / RESIZE_FACTOR);
             }
             return result;
         }
@@ -126,7 +118,8 @@ public class ArrayDeque<T> {
     }
 
     /**
-     * removes last item from the array
+     * Removes last item from the array.
+     * @return the value contained in the item that was removed.
      */
     public T removeLast() {
         if (size == 0) {
@@ -136,8 +129,8 @@ public class ArrayDeque<T> {
             items[last] = null;
             last = minusOne(last);
             size--;
-            if (items.length / 4 == size && size > 8) {
-                downresize(items.length / 2);
+            if (items.length * USAGE_LIMIT == size && size > INIT_CAPACITY) {
+                downresize(items.length / RESIZE_FACTOR);
             }
             return result;
         }
@@ -145,7 +138,7 @@ public class ArrayDeque<T> {
     }
 
     /**
-     * helper function for when removing an item
+     * Helper function for when removing an item.
      */
     private int minusOne(int input) {
         if (input - 1 == -1) {
@@ -157,7 +150,9 @@ public class ArrayDeque<T> {
     }
 
     /**
-     * return item in index inputed
+     * Return item in index passed in.
+     * @param index integer representing the numerical location of item in deque.
+     * @return the value of type T at the indexed location in the deque.
      */
     public T get(int index) {
         T it = items[(index + first) % items.length];
@@ -165,7 +160,8 @@ public class ArrayDeque<T> {
     }
 
     /**
-     * resizes when the size of the array to be bigger
+     * Increases the capacity of the array.
+     * @param newsize represents the new capacity of the array.
      */
     private void upresize(int newsize) {
         T[] newArray = (T[]) new Object[newsize];
@@ -183,7 +179,8 @@ public class ArrayDeque<T> {
     }
 
     /**
-     * resizes the size of the array to be smaller.
+     * Decreases the capacity of the array.
+     * @param newsize represents the new capacity of the array.
      */
     private void downresize(int newsize) {
         T[] newArray = (T[]) new Object[newsize];

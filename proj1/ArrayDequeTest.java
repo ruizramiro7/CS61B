@@ -3,9 +3,9 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class ArrayDequeTest {
-    public static void main(String[] args) {
-        testResize(128);
-    }
+    //public static void main(String[] args) {
+    //    testResize(128);
+    //}
 
     @Test
     public void testInit() {
@@ -37,7 +37,7 @@ public class ArrayDequeTest {
 
     @Test
     public void removeFirstTest() {
-        LinkedListDeque<String> test = new LinkedListDeque<>();
+        ArrayDeque<String> test = new ArrayDeque<>();
         test.addFirst("item0");
         assertEquals(1, test.size());
         assertEquals("item0", test.get(0));
@@ -51,7 +51,7 @@ public class ArrayDequeTest {
 
     @Test
     public void removeLastTest() {
-        LinkedListDeque<String> test = new LinkedListDeque<>();
+        ArrayDeque<String> test = new ArrayDeque<>();
         test.addFirst("item0");
         assertEquals(1, test.size());
         assertEquals("item0", test.get(0));
@@ -63,16 +63,16 @@ public class ArrayDequeTest {
         assertEquals("item0", test.get(0));
     }
 
-    @Test
-    public static void testResize(int runs) {
-        ArrayDeque<Integer> arr = new ArrayDeque();
-        for (int x = 1; x <= runs; x++) {
-            arr.addFirst(x);
-            arr.printDeque();
-        }
-        for (int x = 1; x <= runs; x++) {
-            arr.removeFirst();
-            arr.printDeque();
-        }
-    }
+    //@Test
+    //public void testResize(int runs) {
+    //    ArrayDeque<Integer> arr = new ArrayDeque();
+    //    for (int x = 1; x <= runs; x++) {
+    //        arr.addFirst(x);
+    //        arr.printDeque();
+    //    }
+    //    for (int x = 1; x <= runs; x++) {
+    //        arr.removeFirst();
+    //        arr.printDeque();
+    //    }
+    //}
 }

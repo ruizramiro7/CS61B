@@ -11,7 +11,7 @@ public class LinkedListDeque<T> implements Deque<T> {
 
     /**
      * Represents the nodes of the linked-list.
-     * Contains and item of type T and references
+     * Contains an item of type T and references
      * to the previous and next node.
      * @param <T> Object Type
      */
