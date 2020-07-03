@@ -58,7 +58,8 @@ public class ArrayDeque<T> implements Deque<T>{
     }
 
     /**
-     * Add an empty thing in the set.
+     * Add an empty item in the set.
+     * @param item Object of type T to add.
      */
     private void addEmpty(T item) {
         first = 0;
@@ -68,6 +69,8 @@ public class ArrayDeque<T> implements Deque<T>{
 
     /**
      * Helper function for when adding an item.
+     * @param index Numerical marker increasing using modular arithmetic
+     *              with capacity.
      */
     private int plusOne(int index) {
         if (index + 1 == items.length) {
@@ -139,20 +142,22 @@ public class ArrayDeque<T> implements Deque<T>{
 
     /**
      * Helper function for when removing an item.
+     * @param index Numerical address decremented using modular arithmetic
+     *              with capacity.
      */
-    private int minusOne(int input) {
-        if (input - 1 == -1) {
-            input = items.length - 1;
+    private int minusOne(int index) {
+        if (index - 1 == -1) {
+            index = items.length - 1;
         } else {
-            input = input - 1;
+            index = index - 1;
         }
-        return input;
+        return index;
     }
 
     /**
      * Return item in index passed in.
-     * @param index integer representing the numerical location of item in deque.
-     * @return the value of type T at the indexed location in the deque.
+     * @param index Integer representing the numerical location of item in deque.
+     * @return Returns the value of type T at the indexed location in the deque.
      */
     public T get(int index) {
         T it = items[(index + first) % items.length];
@@ -161,7 +166,7 @@ public class ArrayDeque<T> implements Deque<T>{
 
     /**
      * Increases the capacity of the array.
-     * @param newsize represents the new capacity of the array.
+     * @param newsize Represents the new capacity of the array.
      */
     private void upresize(int newsize) {
         T[] newArray = (T[]) new Object[newsize];
@@ -180,7 +185,7 @@ public class ArrayDeque<T> implements Deque<T>{
 
     /**
      * Decreases the capacity of the array.
-     * @param newsize represents the new capacity of the array.
+     * @param newsize Represents the new capacity of the array.
      */
     private void downresize(int newsize) {
         T[] newArray = (T[]) new Object[newsize];
