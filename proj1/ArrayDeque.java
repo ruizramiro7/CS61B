@@ -1,9 +1,8 @@
 /**
- *
  * @param <T>
- * @source https://cs61bl.org/su20/projects/deques/
  * @author Ramiro Ruiz
  * @author Brandon Bizzarro
+ * @source https://cs61bl.org/su20/projects/deques/
  */
 public class ArrayDeque<T> {
     private T[] items;
@@ -26,8 +25,11 @@ public class ArrayDeque<T> {
             addLast((T) other.get(i));
         }
     }
-    /** adds item to front of array */
-    public void addFirst(T item){
+
+    /**
+     * adds item to front of array.
+     */
+    public void addFirst(T item) {
         if (size == 0) {
             addEmpty(item);
             size++;
@@ -40,8 +42,11 @@ public class ArrayDeque<T> {
             size++;
         }
     }
-    /** adds item to end of the list */
-    public void addLast(T item){
+
+    /**
+     * adds item to end of the list
+     */
+    public void addLast(T item) {
         if (size == 0) {
             addEmpty(item);
             size++;
@@ -54,13 +59,19 @@ public class ArrayDeque<T> {
             items[last] = item;
         }
     }
-    /** add an empty thing in the set */
+
+    /**
+     * add an empty thing in the set
+     */
     private void addEmpty(T item) {
         first = 0;
         last = 0;
         items[0] = item;
     }
-    /** helper function for when adding an item */
+
+    /**
+     * helper function for when adding an item
+     */
     private int plusOne(int index) {
         if (index + 1 == items.length) {
             index = 0;
@@ -70,25 +81,35 @@ public class ArrayDeque<T> {
         return index;
     }
 
-    /** checks if array is empty */
-    public boolean isEmpty(){
+    /**
+     * checks if array is empty
+     */
+    public boolean isEmpty() {
         return size == 0;
     }
 
-    /** returns size of array */
-    public int size(){
+    /**
+     * returns size of array
+     */
+    public int size() {
         return size;
     }
-    /** Prints out array deque */
-    public void printDeque(){
+
+    /**
+     * Prints out array deque
+     */
+    public void printDeque() {
         for (int x = 0; x < size; x++) {
             System.out.print(get(x));
             System.out.print(" ");
         }
         System.out.println();
     }
-    /** removes first item for the array*/
-    public T removeFirst(){
+
+    /**
+     * removes first item for the array
+     */
+    public T removeFirst() {
         if (size == 0) {
             return null;
         } else {
@@ -103,8 +124,11 @@ public class ArrayDeque<T> {
         }
 
     }
-    /** removes last item from the array*/
-    public T removeLast(){
+
+    /**
+     * removes last item from the array
+     */
+    public T removeLast() {
         if (size == 0) {
             return null;
         } else {
@@ -119,7 +143,10 @@ public class ArrayDeque<T> {
         }
 
     }
-    /** helper function for when removing an item */
+
+    /**
+     * helper function for when removing an item
+     */
     private int minusOne(int input) {
         if (input - 1 == -1) {
             input = items.length - 1;
@@ -128,12 +155,18 @@ public class ArrayDeque<T> {
         }
         return input;
     }
-    /** return item in index inputed */
-    public T get(int index){
+
+    /**
+     * return item in index inputed
+     */
+    public T get(int index) {
         T it = items[(index + first) % items.length];
         return it;
     }
-    /** resizes when the size of the array to be bigger */
+
+    /**
+     * resizes when the size of the array to be bigger
+     */
     private void upresize(int newsize) {
         T[] newArray = (T[]) new Object[newsize];
         if (first <= last) {
@@ -148,7 +181,10 @@ public class ArrayDeque<T> {
         last = newArray.length / 2;
         items = newArray;
     }
-    /**  resizes the size of the array to be smaller.*/
+
+    /**
+     * resizes the size of the array to be smaller.
+     */
     private void downresize(int newsize) {
         T[] newArray = (T[]) new Object[newsize];
         if (first <= last) {

@@ -1,8 +1,9 @@
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 public class ArrayDequeTest {
-    public static void main (String args []){
+    public static void main(String[] args) {
         testResize(128);
     }
 
@@ -11,9 +12,10 @@ public class ArrayDequeTest {
         ArrayDeque<Integer> num = new ArrayDeque<>();
         assertTrue(num.isEmpty());
     }
+
     @Test
-    public void testAddFirst(){
-        ArrayDeque <String> test = new ArrayDeque<>();
+    public void testAddFirst() {
+        ArrayDeque<String> test = new ArrayDeque<>();
         test.addFirst("1");
         assertEquals(1, test.size());
         assertEquals("1", test.get(0));
@@ -21,9 +23,10 @@ public class ArrayDequeTest {
         assertEquals(2, test.size());
         assertEquals("2", test.get(0));
     }
+
     @Test
-    public void testAddLast(){
-        ArrayDeque <String> test = new ArrayDeque<>();
+    public void testAddLast() {
+        ArrayDeque<String> test = new ArrayDeque<>();
         test.addLast("item0");
         assertEquals(1, test.size());
         assertEquals("item0", test.get(0));
@@ -31,6 +34,7 @@ public class ArrayDequeTest {
         assertEquals(2, test.size());
         assertEquals("item1", test.get(1));
     }
+
     @Test
     public void removeFirstTest() {
         LinkedListDeque<String> test = new LinkedListDeque<>();
@@ -44,6 +48,7 @@ public class ArrayDequeTest {
         assertEquals(1, test.size());
         assertEquals("item0", test.get(0));
     }
+
     @Test
     public void removeLastTest() {
         LinkedListDeque<String> test = new LinkedListDeque<>();
@@ -57,6 +62,7 @@ public class ArrayDequeTest {
         assertEquals(1, test.size());
         assertEquals("item0", test.get(0));
     }
+
     @Test
     public static void testResize(int runs) {
         ArrayDeque<Integer> arr = new ArrayDeque();
