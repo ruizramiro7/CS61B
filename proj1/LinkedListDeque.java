@@ -33,12 +33,12 @@ public class LinkedListDeque<T> implements Deque<T> {
         }
     }
 
-    private LinkedListNode<T> front;
+    private final LinkedListNode<T> front;
     private int size;
 
     public LinkedListDeque() {
         // Front represents the sentinel which contains a null throwaway value.
-        front = new LinkedListNode<T>(null, null, null);
+        front = new LinkedListNode<>(null, null, null);
         // Set the front node to point forward and backward to itself.
         front.next = front;
         front.prev = front;
@@ -51,7 +51,7 @@ public class LinkedListDeque<T> implements Deque<T> {
      */
     public void addFirst(T item) {
         // Set first node to point backward to new first node containing ITEM.
-        front.next.prev = new LinkedListNode<T>(item, front, front.next);
+        front.next.prev = new LinkedListNode<>(item, front, front.next);
         // Set front to point forward to new first node.
         front.next = front.next.prev;
         size += 1;
@@ -63,7 +63,7 @@ public class LinkedListDeque<T> implements Deque<T> {
      */
     public void addLast(T item) {
         // Set the last node to point forward to a new node containing ITEM.
-        front.prev.next = new LinkedListNode<T>(item, front.prev, front);
+        front.prev.next = new LinkedListNode<>(item, front.prev, front);
         // Set the front node to point backward to the new last node.
         front.prev = front.prev.next;
         size += 1;
@@ -157,8 +157,8 @@ public class LinkedListDeque<T> implements Deque<T> {
 
     /**
      * Gets the item at the given index, recursively.
-     * @param index
-     * @return
+     * @param index The numerical position of the item being accessed in the deque.
+     * @return the value of type T contained at the numerical position INDEX.
      */
     public T getRecursive(int index) {
         return getRecHelper(index, front.next).item;
