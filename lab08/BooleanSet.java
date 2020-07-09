@@ -16,6 +16,9 @@ public class BooleanSet implements SimpleSet {
     /** Adds k to the set. */
     public void add(int k) {
         // TODO
+        if (contains[k]) {
+            return;
+        }
         contains[k] = true;
         size += 1;
     }
@@ -23,6 +26,9 @@ public class BooleanSet implements SimpleSet {
     /** Removes k from the set. */
     public void remove(int k) {
         // TODO
+        if (!contains[k]) {
+            return;
+        }
         contains[k] = false;
         size -= 1;
     }

@@ -1,4 +1,5 @@
 import java.util.HashSet;
+import java.util.HashMap;
 
 public class CodingChallenges {
 
@@ -38,24 +39,27 @@ public class CodingChallenges {
         return false;
     }
 
+    private static HashMap<Character, Integer> buildCharMap(String s) {
+        HashMap<Character, Integer> m = new HashMap<>();
+        for (char c: s.toCharArray()) {
+            if (m.containsKey(c)) {
+                m.replace(c, m.get(c) + 1);
+            }
+            else {
+                m.put(c, 1);
+            }
+        }
+        return m;
+    }
+
     /**
      * Returns true if and only if s1 is a permutation of s2. s1 is a
      * permutation of s2 if it has the same number of each character as s2.
      */
     public static boolean isPermutation(String s1, String s2) {
         // TODO
-        if (s1.length() != s2.length()) {
-            return false;
-        }
-
-        HashSet<Character>  set1 = new HashSet<>();
-        HashSet<Character>  set2 = new HashSet<>();
-
-        for (int i = 0; i < s1.length(); ++i) {
-            set1.add(s1.charAt(i));
-            set2.add(s2.charAt(i));
-        }
-
-        return set1.containsAll(set2);
+        HashMap<Character, Integer> map1 = buildCharMap(s1);
+        HashMap<Character, Integer> map2 = buildCharMap(s2);
+        return map1.equals(map2);
     }
 }
