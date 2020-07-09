@@ -1,3 +1,5 @@
+import java.util.HashSet;
+
 public class CodingChallenges {
 
     /**
@@ -5,7 +7,16 @@ public class CodingChallenges {
      * values from 0 to N except for one missing number.
      */
     public static int missingNumber(int[] values) {
-        // TODO
+
+        HashSet<Integer> set = new HashSet<>();
+        for (int i: values){
+            set.add(i);
+        }
+        for (int i = 0; i < values.length; ++i) {
+            if (!set.contains(i)) {
+               return i;
+            }
+        }
         return -1;
     }
 
@@ -15,6 +26,15 @@ public class CodingChallenges {
      */
     public static boolean sumTo(int[] values, int n) {
         // TODO
+        HashSet<Integer> set = new HashSet<>();
+        for (int i: values){
+            set.add(i);
+        }
+        for (int v: values) {
+            if (n - v != v && set.contains(n - v)) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -24,6 +44,18 @@ public class CodingChallenges {
      */
     public static boolean isPermutation(String s1, String s2) {
         // TODO
-        return false;
+        if (s1.length() != s2.length()) {
+            return false;
+        }
+
+        HashSet<Character>  set1 = new HashSet<>();
+        HashSet<Character>  set2 = new HashSet<>();
+
+        for (int i = 0; i < s1.length(); ++i) {
+            set1.add(s1.charAt(i));
+            set2.add(s2.charAt(i));
+        }
+
+        return set1.containsAll(set2);
     }
 }

@@ -12,6 +12,24 @@ public class GregorianDate extends Date {
     // YOUR CODE HERE
 
     @Override
+    public Date nextDate() {
+        int newDay = dayOfMonth + 1;
+        int newMonth = month;
+        int newYear = year;
+
+        if (newDay > MONTH_LENGTHS[month - 1]) {
+            newDay = 1;
+            newMonth += 1;
+        }
+
+        if (newMonth > MONTH_LENGTHS.length) {
+            newMonth = 1;
+            newYear += 1;
+        }
+        return new GregorianDate(newYear, newMonth, newDay);
+    }
+
+    @Override
     public int dayOfYear() {
         int precedingMonthDays = 0;
         for (int m = 1; m < month; m += 1) {
