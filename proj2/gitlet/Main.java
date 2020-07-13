@@ -1,7 +1,8 @@
 package gitlet;
 
 /** Driver class for Gitlet, the tiny stupid version-control system.
- *  @author
+ *  @author Ramiro Ruiz
+ *  @author Brandon Bizzarro
  */
 public class Main {
 
