@@ -15,23 +15,28 @@ public class Main {
      *  <COMMAND> <OPERAND> .... */
     public static void main(String... args) {
         if (args.length == 0) {
-            exitWithError("Must have at least one argument");
+            exitWithError("Please enter a command.");
         }
         if (!args[0].equals("init") && !checkInit()) {
-            exitWithError("Gitlet has not been initialized in this directory.");
+            exitWithError("Not in an initialized Gitlet directory.");
         }
         switch (args[0]) {
             case "init":
                 System.out.println("initializing");
-                initialize();
+                if (checkInit()) {
+                    break;
+                }
+                initialize(args);
                 break;
             case "add":
+                add(args);
                 break;
             case "commit":
                 break;
             case "rm":
                 break;
             case "log":
+                log(args);
                 break;
             case "global-log":
                 break;
@@ -51,6 +56,9 @@ public class Main {
                 break;
             case "rebase":
                 break;
+            default:
+                exitWithError("No command with that name exists.");
+                break;
         }
     }
 
@@ -58,9 +66,17 @@ public class Main {
         return METADATA_DIR.exists() && CommitTree.COMMIT_LOG.exists();
     }
 
-    public static void initialize() {
+    public static void initialize(String... args) {
+        validateNumArgs(args, 1);
+
         if (!METADATA_DIR.exists()) {
             METADATA_DIR.mkdir();
+        }
+        if (!CommitTree.COMMITS.exists()) {
+            CommitTree.COMMITS.mkdir();
+        }
+        if (!CommitTree.STAGING_AREA.exists()) {
+            CommitTree.STAGING_AREA.mkdir();
         }
         try {
             CommitTree.COMMIT_LOG.createNewFile();
@@ -68,6 +84,48 @@ public class Main {
         catch (IOException e) {
             e.printStackTrace();
         }
+
+        CommitTree initCommit = new CommitTree();
+        initCommit.save();
+    }
+
+    public static void add(String... args) {
+        validateNumArgs(args, 2);
+
+        CommitTree tree = CommitTree.load();
+        File[] files = new File[args.length - 1];
+        File fileToAdd;
+        for (int i = 1; i < args.length; ++i) {
+            fileToAdd = new File(args[i]);
+            if (!fileToAdd.exists()) {
+                exitWithError("File does not exist.");
+            }
+            else {
+                files[i - 1] = fileToAdd;
+            }
+        }
+        System.out.println(files[0].toString());
+
+        File fileAsCopy;
+        for (File f: files) {
+            fileAsCopy = Utils.join(CommitTree.STAGING_AREA, f.toString());
+            if (fileAsCopy.exists()) {
+                fileAsCopy.delete();
+            }
+            try {
+                fileAsCopy.createNewFile();
+                Utils.writeContents(fileAsCopy, Utils.readContentsAsString(f));
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void log(String... args) {
+        validateNumArgs(args, 1);
+        CommitTree tree = CommitTree.load();
+        tree.printLog();
     }
 
     /**
@@ -78,8 +136,23 @@ public class Main {
         if (message != null && !message.equals("")) {
             System.out.println(message);
         }
-        System.exit(-1);
+        System.exit(0);
     }
+
+    /**
+     * Checks the number of arguments versus the expected number,
+     * throws a RuntimeException if they do not match.
+     *
+     * @param args Argument array from command line
+     * @param n    Number of expected arguments
+     */
+    public static void validateNumArgs(String[] args, int n) {
+        if (args.length != n) {
+            throw new RuntimeException(
+                    String.format("Incorrect operands."));
+        }
+    }
+
 
 
 }
