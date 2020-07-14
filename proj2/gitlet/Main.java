@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
 
 /** Driver class for Gitlet, the tiny stupid version-control system.
  *  @author Ramiro Ruiz
@@ -9,7 +10,6 @@ import java.io.File;
 public class Main {
     static final File CWD = new File(".");
     static final File METADATA_DIR = Utils.join(CWD, ".gitlet");
-    static final File COMMIT_LOG = Utils.join(METADATA_DIR, "commits");
 
     /** Usage: java gitlet.Main ARGS, where ARGS contains
      *  <COMMAND> <OPERAND> .... */
@@ -17,8 +17,13 @@ public class Main {
         if (args.length == 0) {
             exitWithError("Must have at least one argument");
         }
+        if (!args[0].equals("init") && !checkInit()) {
+            exitWithError("Gitlet has not been initialized in this directory.");
+        }
         switch (args[0]) {
             case "init":
+                System.out.println("initializing");
+                initialize();
                 break;
             case "add":
                 break;
@@ -49,8 +54,20 @@ public class Main {
         }
     }
 
-    public static void initialize() {
+    public static boolean checkInit() {
+        return METADATA_DIR.exists() && CommitTree.COMMIT_LOG.exists();
+    }
 
+    public static void initialize() {
+        if (!METADATA_DIR.exists()) {
+            METADATA_DIR.mkdir();
+        }
+        try {
+            CommitTree.COMMIT_LOG.createNewFile();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
