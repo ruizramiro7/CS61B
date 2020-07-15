@@ -22,7 +22,6 @@ public class Main {
         }
         switch (args[0]) {
             case "init":
-                System.out.println("initializing");
                 if (checkInit()) {
                     break;
                 }
@@ -104,22 +103,7 @@ public class Main {
                 files[i - 1] = fileToAdd;
             }
         }
-        System.out.println(files[0].toString());
-
-        File fileAsCopy;
-        for (File f: files) {
-            fileAsCopy = Utils.join(CommitTree.STAGING_AREA, f.toString());
-            if (fileAsCopy.exists()) {
-                fileAsCopy.delete();
-            }
-            try {
-                fileAsCopy.createNewFile();
-                Utils.writeContents(fileAsCopy, Utils.readContentsAsString(f));
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        tree.stage(files);
     }
 
     public static void log(String... args) {

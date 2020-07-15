@@ -1,8 +1,14 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 
 public class CommitTree implements Serializable {
@@ -13,8 +19,9 @@ public class CommitTree implements Serializable {
 
     public class CommitNode implements Serializable {
         private String message;
-        private Timestamp timestamp;
+        private Date timestamp;
         private String id;
+        //private HashMap<String, String> references = new HashMap<String, String>();
         private HashMap<String, String> references;
         public CommitNode parent;
         //public CommitNode[] next;
@@ -24,37 +31,46 @@ public class CommitTree implements Serializable {
          * @source https://mkyong.com/java/how-to-get-current-timestamps-in-java/
          * @param message
          */
-        public CommitNode(String message, Timestamp timestamp) {
+        public CommitNode(String message, Date timestamp) {
+
             this.message = message;
             this.timestamp = timestamp;
-            if (references == null) {
-                id = Utils.sha1(timestamp.toString());
-            }
-            else {
-                id = Utils.sha1(references.values().toArray(), timestamp.toString());
-            }
-            System.out.println("New commit with id: " + id);
+            references = new HashMap<String, String>();
+
+            String uniqueId = Arrays.stream(references.values().toArray())
+                    .map(e -> e.toString()).reduce("", String::concat);
+            id = Utils.sha1(uniqueId + timestamp.toString());
         }
 
         public String toString() {
+            SimpleDateFormat format
+                    = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
+            String date = format.format(timestamp);
             String s = "";
-            s += "===\n";
-            s += "commit " + id + "\n";
-            s += "Date: " + timestamp.toString() + "\n";
-            s += message + "\n";
+            s += "===\n"
+              + "commit " + id + "\n"
+              + "Date: " + date + "\n"
+              + message + "\n";
             return s;
+        }
+
+        public boolean contains(String name, String id) {
+            if (references.containsKey(name)) {
+                return references.get(name).equals(id);
+            }
+            return false;
         }
 
     }
 
     private CommitNode head;
     private CommitNode[] branches;
-    private CommitNode staged;
+    private HashMap<String, String> staged;
 
     public CommitTree() {
-        head = new CommitNode("initial commit",
-                             new Timestamp(1970, 1, 1, 0, 0, 0, 0));
 
+        head = new CommitNode("initial commit", new Date(0));
+        staged = new HashMap<String, String>();
     }
 
     public static CommitTree load() {
@@ -72,4 +88,47 @@ public class CommitTree implements Serializable {
             curr = curr.parent;
         }
     }
+
+    public void commit() {
+
+    }
+
+    public void stage(File[] files) {
+
+        File fileAsCopy;
+        for (File f: files) {
+            String contents = Utils.readContentsAsString(f);
+            String id = Utils.sha1(f.getName() + contents);
+
+            if (head.contains(f.getName(), id)) {
+                continue;
+            }
+
+            fileAsCopy = Utils.join(STAGING_AREA, id);
+            if (fileAsCopy.exists()) {
+                fileAsCopy.delete();
+            }
+            try {
+                fileAsCopy.createNewFile();
+                Utils.writeContents(fileAsCopy,contents);
+                if (staged.containsKey(f.getName())) {
+                    staged.replace(f.getName(), id);
+                }
+                else {
+                    staged.put(f.getName(), id);
+                }
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+
+
+    }
+
+    //public boolean contains(File file) {
+
+    //}
 }
