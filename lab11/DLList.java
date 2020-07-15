@@ -29,7 +29,7 @@ public class DLList<Item> implements Iterable<Item>{
             }
             Item curr = sentinel.next.item;
             sentinel.next = sentinel.next.next;
-            sentinel.prev = sentinel.next.prev;
+            //sentinel.prev = sentinel.next.prev;
             return curr;
         }
     }
