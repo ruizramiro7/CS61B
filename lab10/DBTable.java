@@ -44,8 +44,8 @@ public class DBTable<T> {
      */
     public <R extends Comparable<R>> List<T> getOrderedBy(Function<T, R> getter) {
         List<T> lst = getEntries();
-        Collections.sort( lst, Comparator.comparing(getter::apply));
-        // Collections.sort( lst, (o1, o2) ->  (getter.apply(o1)).compareTo(getter.apply(o2)));
+        lst.sort((o1, o2) ->  (getter.apply(o1)).compareTo(getter.apply(o2)));
+        //Collections.sort( lst, Comparator.comparing(getter::apply));
         return lst;
     }
 

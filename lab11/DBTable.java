@@ -1,9 +1,6 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class DBTable<T> {
     private List<T> entries;
@@ -47,8 +44,10 @@ public class DBTable<T> {
      * results of the getter. Non-destructive.
      */
     public <R extends Comparable<R>> List<T> getOrderedBy(Function<T, R> getter) {
+        List<T> lst = getEntries();
+        Collections.sort( lst, (o1, o2) ->  (getter.apply(o1)).compareTo(getter.apply(o2)));
         // TODO
-        return null;
+        return lst;
     }
 
     /**
@@ -69,8 +68,8 @@ public class DBTable<T> {
      * 
      */
     public <R> List<T> getWhitelisted(Function<T, R> getter, Collection<R> whitelist) {
-        // TODO
-        return null;
+        List<T> lst = getEntries();
+        return lst.stream().filter(s -> whitelist.contains(getter.apply(s))).collect(Collectors.toList());
     }
 
     /**
@@ -79,8 +78,9 @@ public class DBTable<T> {
      * DBTable<String> names = table.getSubtableOf(User::getUsername);
      */
     public <R> DBTable<R> getSubtableOf(Function<T, R> getter) {
-        // TODO
-        return null;
+        return new DBTable<R> (getEntries().stream()
+                .map(s -> getter.apply(s))
+                .collect(Collectors.toList()));
     }
 
     public static void main(String[] args) {
@@ -91,8 +91,16 @@ public class DBTable<T> {
                 new User(1, "Shreya", ""),
                 new User(1, "Connor", "")
                 );
+
+
+        List<String> whiteListedNames = Arrays.asList("Connor", "Shreya");
+        DBTable<User> v = new DBTable<>(users);
+        List<User> whiteListedUsers = v.getWhitelisted(User::getName, whiteListedNames);
+        whiteListedUsers.forEach(System.out:: println);
         DBTable<User> t = new DBTable<>(users);
         List<User> l = t.getOrderedBy(User::getName);
         l.forEach(System.out::println);
+        DBTable<User> s = new DBTable<>(users);
+        DBTable<String> names = s.getSubtableOf(User::getName);
     }
 }
