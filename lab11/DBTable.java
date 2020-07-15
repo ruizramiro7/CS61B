@@ -48,7 +48,6 @@ public class DBTable<T> {
      * results of the getter. Non-destructive.
      */
     public <R extends Comparable<R>> List<T> getOrderedBy(Function<T, R> getter) {
-        // TODO
         return entries
                 .stream().sorted((a, b) -> getter.apply(a).compareTo(getter.apply(b)))
                 .collect(Collectors.toList());
