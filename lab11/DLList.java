@@ -14,9 +14,11 @@ public class DLList<Item> implements Iterable<Item>{
 
     private class DLListIterator implements Iterator<Item>{
 
+        private Node curr = sentinel.next;
+
         @Override
         public boolean hasNext() {
-            if (sentinel.next == sentinel) {
+            if (curr == sentinel) {
                 return false;
             }else
             return true;
@@ -27,10 +29,8 @@ public class DLList<Item> implements Iterable<Item>{
             if (!hasNext()){
                 throw new IndexOutOfBoundsException("Out of bounds");
             }
-            Item curr = sentinel.next.item;
-            sentinel.next = sentinel.next.next;
-            //sentinel.prev = sentinel.next.prev;
-            return curr;
+            curr = curr.next;
+            return curr.prev.item;
         }
     }
 
