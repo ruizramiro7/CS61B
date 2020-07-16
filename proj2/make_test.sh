@@ -3,6 +3,8 @@
 #d="gitlet/"
 #javac ${d}Main.java ${d}CommitTree.java ${d}Utils.java ${d}GitletException.java;
 
+# Run me with: bash make_test.sh
+
 path="gitlet"
 files=""
 
