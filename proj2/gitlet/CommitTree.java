@@ -91,7 +91,6 @@ public class CommitTree implements Serializable {
 
     public void commit(String message) {
 
-        System.out.println("committing");
         // Loop over all staged docs
         for (String filename: staged.keySet()) {
             // Get unique SHA-1 associated with filename.
