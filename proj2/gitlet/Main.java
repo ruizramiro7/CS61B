@@ -17,6 +17,8 @@ public class Main {
         if (args.length == 0) {
             exitWithError("Please enter a command.");
         }
+        // Exit if the user tries to use a command other than init before
+        // initializing the directory.
         if (!args[0].equals("init") && !checkInit()) {
             exitWithError("Not in an initialized Gitlet directory.");
         }
@@ -89,6 +91,12 @@ public class Main {
         initCommit.save();
     }
 
+    /**
+     * Collects all the files specified in the add command and passes
+     * them to the CommitTree.
+     * @param args Command line arguments containing the add command
+     *             and the names of the files to add.
+     */
     public static void add(String... args) {
         validateNumArgs(args, 2);
 
