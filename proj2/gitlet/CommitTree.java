@@ -89,8 +89,33 @@ public class CommitTree implements Serializable {
         }
     }
 
-    public void commit() {
+    public void commit(String message) {
 
+        System.out.println("committing");
+        // Loop over all staged docs
+        for (String filename: staged.keySet()) {
+            // Get unique SHA-1 associated with filename.
+            String fileID = staged.get(filename);
+            // Copy staged file to committed file.
+            File oldFile = Utils.join(STAGING_AREA, fileID);
+            File newFile = Utils.join(COMMITS, fileID);
+            String contents = Utils.readContentsAsString(oldFile);
+            try {
+                newFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Utils.writeContents(newFile, contents);
+            //!// Delete staged file after copying
+            oldFile.delete();
+        }
+
+        // Create commit node with new data and update head.
+        CommitNode newCommit
+                = new CommitNode(message, new Date(System.currentTimeMillis()));
+        newCommit.parent = head;
+        head = newCommit;
+        save();
     }
 
     public void stage(File[] files) {
@@ -122,10 +147,7 @@ public class CommitTree implements Serializable {
                 e.printStackTrace();
             }
         }
-
-
-
-
+        save();
     }
 
     //public boolean contains(File file) {

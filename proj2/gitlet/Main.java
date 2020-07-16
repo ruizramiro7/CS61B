@@ -31,6 +31,7 @@ public class Main {
                 add(args);
                 break;
             case "commit":
+                commit(args);
                 break;
             case "rm":
                 break;
@@ -104,6 +105,12 @@ public class Main {
             }
         }
         tree.stage(files);
+    }
+
+    public static void commit(String... args) {
+        validateNumArgs(args, 2);
+        CommitTree tree = CommitTree.load();
+        tree.commit(args[1]);
     }
 
     public static void log(String... args) {
