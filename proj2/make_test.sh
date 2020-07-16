@@ -22,18 +22,23 @@ rm -r $testdir
 mkdir $testdir
 mkdir $testdir/gitlet
 cp gitlet/*.class ./$testdir/gitlet
+echo "Creating file called test.txt with text 'version 1'"
 touch ./$testdir/test.txt
 echo "version 1" >> ./$testdir/test.txt
 cd $testdir
+echo "java gitlet.Main init"
 java gitlet.Main init
+echo "java gitlet.Main add test.txt"
 java gitlet.Main add "test.txt"
+echo "gitlet.Main log"
 java gitlet.Main log
+echo "gitlet.Main commit 'test commit'"
 java gitlet.Main commit "test commit"
-echo "Looking in staging area and found..."
+echo "ls .gitlet/stage"
 ls .gitlet/stage
-echo "Looking in commits and found..."
+echo "ls .gitlet/commits"
 ls .gitlet/commits
-echo "Printing commit log"
+echo "java gitlet.Main log"
 java gitlet.Main log
-echo "done"
+echo "Done"
 cd ..
