@@ -50,7 +50,7 @@ public class CommitTree implements Serializable {
             s += "===\n"
               + "commit " + id + "\n"
               + "Date: " + date + "\n"
-              + message + "\n";
+              + message + "\n\n";
             return s;
         }
 
