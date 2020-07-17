@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
 /* An AmoebaFamily is a tree, where nodes are Amoebas, each of which can have
    any number of children. */
@@ -26,7 +25,7 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
        the ROOT Amoeba printed first. Each Amoeba should be indented four spaces
        more than its parent. */
     public void print() {
-        // TODO: YOUR CODE HERE
+        root.printHelper(0);
     }
 
     /* Returns the length of the longest name in this AmoebaFamily. */
@@ -45,7 +44,7 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
 
     /* Returns an Iterator for this AmoebaFamily. */
     public Iterator<Amoeba> iterator() {
-        return new AmoebaDFSIterator();
+        return new AmoebaBFSIterator();
     }
 
     /* Creates a new AmoebaFamily and prints it out. */
@@ -65,6 +64,10 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
         family.addChild("Marge", "Hilary");
         System.out.println("Here's the family:");
         family.print();
+
+        for (Amoeba a: family) {
+            System.out.println(a.name);
+        }
     }
 
     /* An Amoeba is a node of an AmoebaFamily. */
@@ -115,7 +118,15 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
             return maxLengthSeen;
         }
 
-        // TODO: ADD HELPER FUNCTIONS HERE
+        public void printHelper(int indent) {
+            for (int i = 0; i < indent; ++i) {
+                System.out.print(" ");
+            }
+            System.out.println(name);
+            for (Amoeba child: children) {
+                child.printHelper(indent + 4);
+            }
+        }
 
     }
 
@@ -125,20 +136,31 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
     public class AmoebaDFSIterator implements Iterator<Amoeba> {
 
         // TODO: IMPLEMENT THE CLASS HERE
+        private Stack<Amoeba> fringe = new Stack<>();
 
         /* AmoebaDFSIterator constructor. Sets up all of the initial information
            for the AmoebaDFSIterator. */
         public AmoebaDFSIterator() {
+            if (root != null) {
+                fringe.push(root);
+            }
         }
 
         /* Returns true if there is a next element to return. */
         public boolean hasNext() {
-            return false;
+            return !fringe.isEmpty();
         }
 
         /* Returns the next element. */
         public Amoeba next() {
-            return null;
+            if (!hasNext()) {
+                throw new NoSuchElementException("tree ran out of elements");
+            }
+            Amoeba amoeba = fringe.pop();
+            for (int i = 0; i < amoeba.children.size(); ++i) {
+                fringe.push(amoeba.children.get(amoeba.children.size() - 1 - i));
+            }
+            return amoeba;
         }
 
         public void remove() {
@@ -151,21 +173,32 @@ public class AmoebaFamily implements Iterable<AmoebaFamily.Amoeba> {
        O(N) operations. */
     public class AmoebaBFSIterator implements Iterator<Amoeba> {
 
-        // TODO: IMPLEMENT THE CLASS HERE
+        private LinkedList<Amoeba> fringe = new LinkedList<>();
 
         /* AmoebaBFSIterator constructor. Sets up all of the initial information
            for the AmoebaBFSIterator. */
         public AmoebaBFSIterator() {
+            if (root != null) {
+                fringe.push(root);
+            }
         }
 
         /* Returns true if there is a next element to return. */
         public boolean hasNext() {
-            return false;
+            return !fringe.isEmpty();
         }
 
         /* Returns the next element. */
         public Amoeba next() {
-            return null;
+            if (!hasNext()) {
+                throw new NoSuchElementException("tree ran out of elements");
+            }
+            Amoeba amoeba = fringe.remove();
+
+            for (Amoeba child: amoeba.children) {
+                fringe.add(child);
+            }
+            return amoeba;
         }
 
         public void remove() {

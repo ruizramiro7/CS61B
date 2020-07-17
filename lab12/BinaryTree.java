@@ -16,8 +16,7 @@ public class BinaryTree<T> {
 
     /* Returns the height of the tree. */
     public int height() {
-        // TODO: YOUR CODE HERE
-        return 0;
+        return root.heightHelper();
     }
 
     /* Returns true if the tree's left and right children are the same height
@@ -30,7 +29,8 @@ public class BinaryTree<T> {
     /* Returns a BinaryTree representing the Fibonacci calculation for N. */
     public static BinaryTree<Integer> fibTree(int N) {
         BinaryTree<Integer> result = new BinaryTree<Integer>();
-        return null;
+        result.root = new TreeNode<Integer>(0).fibHelper(N);
+        return result;
     }
 
     /* Print the values in the tree in preorder: root value first, then values
@@ -101,6 +101,10 @@ public class BinaryTree<T> {
         print(t, "sample tree 1");
         t.sampleTree2();
         print(t, "sample tree 2");
+
+        BinaryTree<Integer> b = BinaryTree.fibTree(20);
+        System.out.println("Final value: " + b.root.item);
+        //b.printInorder();
     }
 
     /* Note: this class is public in this lab for testing purposes. However,
@@ -169,5 +173,23 @@ public class BinaryTree<T> {
         }
 
         // TODO: ADD HELPER METHODS HERE
+        public int heightHelper() {
+            int leftHeight = (left != null) ? left.heightHelper() : 0;
+            int rightHeight = (right != null) ? right.heightHelper() : 0;
+            return 1 + Math.max(leftHeight, rightHeight);
+        }
+
+        public TreeNode<Integer> fibHelper(int num) {
+            if (num <= 1) {
+                return new TreeNode<>(num);
+            }
+            else {
+                TreeNode<Integer> t = new TreeNode<>(0);
+                t.left = t.fibHelper(num - 1);
+                t.right = t.fibHelper(num - 2);
+                t.item = (Integer)t.left.item + (Integer)t.right.item;
+                return  t;
+            }
+        }
     }
 }
