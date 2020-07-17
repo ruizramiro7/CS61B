@@ -16,6 +16,9 @@ public class BinaryTree<T> {
 
     /* Returns the height of the tree. */
     public int height() {
+        if (root == null) {
+            return 0;
+        }
         return root.heightHelper();
     }
 
