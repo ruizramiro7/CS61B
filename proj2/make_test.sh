@@ -40,5 +40,9 @@ echo "ls .gitlet/commits"
 ls .gitlet/commits
 echo "java gitlet.Main log"
 java gitlet.Main log
+echo "java gitlet.Main branch testBranch"
+java gitlet.Main branch testBranch
+echo "java gitlet.Main status"
+java gitlet.Main status
 echo "Done"
 cd ..

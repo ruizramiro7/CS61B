@@ -42,13 +42,19 @@ public class CommitTree implements Serializable {
          * @param message the commit message that displays when using gitet log
          * @param timestamp the current date and time
          */
-        public CommitNode(String message, Date timestamp) {
+        public CommitNode(String message, Date timestamp,
+                          HashMap<String, String> references) {
 
             this.message = message;
             this.timestamp = timestamp;
-            references = new HashMap<String, String>();
+            if (references == null) {
+               this.references = new HashMap<>();
+            }
+            else {
+                this.references = references;
+            }
 
-            String uniqueId = Arrays.stream(references.values().toArray())
+            String uniqueId = Arrays.stream(this.references.values().toArray())
                     .map(e -> e.toString()).reduce("", String::concat);
             id = Utils.sha1(uniqueId + timestamp.toString());
         }
@@ -90,15 +96,72 @@ public class CommitTree implements Serializable {
 
     }
 
+    //!// Should probably make head a method head() that uses currentBranch
     private CommitNode head;
+    private String currentBranch;
     // Branches should probably be a HashMap<BRANCH_NAME, COMMIT_NODE>
-    private CommitNode[] branches;
+    private HashMap<String, CommitNode> branches = new HashMap<>();
     // Holds the references to blobs containing 1) the file name 2) the unique id
-    private HashMap<String, String> staged;
+    private HashMap<String, String> staged = new HashMap<>();
 
     public CommitTree() {
-        head = new CommitNode("initial commit", new Date(0));
-        staged = new HashMap<String, String>();
+        CommitNode newHead = new CommitNode("initial commit", new Date(0), null);
+        branches.put("master", newHead);
+        currentBranch = "master";
+    }
+
+    private CommitNode head() {
+        return branches.get(currentBranch);
+    }
+
+    public void checkout() {
+        File workingFile;
+        File commitFile;
+        for (String fileName: head().references.keySet()) {
+            String fileID = head().references.get(fileName);
+            commitFile = Utils.join(COMMITS, fileID);
+            workingFile = Utils.join(Main.CWD, fileName);
+            String contents = Utils.readContentsAsString(commitFile);
+            Utils.writeContents(workingFile, contents);
+        }
+    }
+
+    public void find() {
+
+    }
+
+    public void status() {
+        System.out.println("=== Branches ===");
+        for (String b: branches.keySet()) {
+            if (b == currentBranch) {
+                System.out.print("*");
+            }
+            System.out.println(b);
+        }
+        System.out.println("\n=== Staged Files ===");
+        for (String r: staged.keySet()) {
+            System.out.println(r);
+        }
+        System.out.println("\n=== Removed Files ===");
+        System.out.println("\n=== Modifications Not Staged for Commit ===");
+        System.out.println("\n=== Untracked Files ===");
+        for (String fileName: Main.CWD.list()) {
+            File f = Utils.join(Main.CWD, fileName);
+            if (f.isDirectory()) {
+                continue;
+            }
+            else if (!head().references.containsKey(fileName)){
+                System.out.println(fileName);
+            }
+        }
+    }
+
+    public void branch(String branchName) throws Exception {
+        if (branches.containsKey(branchName)) {
+            throw new Exception("A branch with that name already exists");
+        }
+        branches.put(branchName, head());
+        save();
     }
 
     /**
@@ -107,7 +170,7 @@ public class CommitTree implements Serializable {
      * directory.
      */
     public static CommitTree load() {
-       return Utils.readObject(COMMIT_LOG, CommitTree.class) ;
+        return Utils.readObject(COMMIT_LOG, CommitTree.class) ;
     }
 
     /**
@@ -122,7 +185,7 @@ public class CommitTree implements Serializable {
      * head to the initial commit.
      */
     public void printLog() {
-        CommitNode curr = head;
+        CommitNode curr = head();
         while (curr != null) {
             System.out.print(curr.toString());
             // Red line in IntelliJ but still compiles?
@@ -130,7 +193,6 @@ public class CommitTree implements Serializable {
         }
     }
 
-    // !!!!! NEED TO MAKE COMMIT UPDATE FROM PARENT
     /**
      * Creates a new commit node by overwriting parent commit with new changes.
      * @param message The commit message that should be displayed with the
@@ -156,12 +218,20 @@ public class CommitTree implements Serializable {
             oldFile.delete();
         }
 
-        // Create commit node with new data and update head.
-        CommitNode newCommit
-                = new CommitNode(message, new Date(System.currentTimeMillis()));
+        HashMap<String, String> newReferences = new HashMap<String, String>();
+        newReferences.putAll(staged);
+        staged.clear();
+        newReferences.putAll(head().references);
+
+        // Create commit node with new data and update head().
+        CommitNode newCommit = new CommitNode(
+                                    message,
+                                    new Date(System.currentTimeMillis()),
+                                    newReferences);
         // Red line in IntelliJ but still compiles?
-        newCommit.parent = head;
-        head = newCommit;
+        newCommit.parent = head();
+        //head = newCommit;
+        branches.replace(currentBranch, newCommit);
         save();
     }
 
@@ -177,7 +247,7 @@ public class CommitTree implements Serializable {
             String contents = Utils.readContentsAsString(f);
             String id = Utils.sha1(f.getName() + contents);
 
-            if (head.contains(f.getName(), id)) {
+            if (head().contains(f.getName(), id)) {
                 continue;
             }
 

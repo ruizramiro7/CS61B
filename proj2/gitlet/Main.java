@@ -43,12 +43,16 @@ public class Main {
             case "global-log":
                 break;
             case "find":
+                find(args);
                 break;
             case "status":
+                status(args);
                 break;
             case "checkout":
+                checkout(args);
                 break;
             case "branch":
+                branch(args);
                 break;
             case "rm-branch":
                 break;
@@ -125,6 +129,33 @@ public class Main {
         validateNumArgs(args, 1);
         CommitTree tree = CommitTree.load();
         tree.printLog();
+    }
+
+    public static void find(String... args) {
+        validateNumArgs(args, 2);
+    }
+
+    public static void status(String... args) {
+        validateNumArgs(args, 1);
+        CommitTree tree = CommitTree.load();
+        tree.status();
+    }
+
+    public static void checkout(String... args) {
+        validateNumArgs(args, 1);
+        CommitTree tree = CommitTree.load();
+        tree.checkout();
+    }
+
+    public static void branch(String... args) {
+        validateNumArgs(args, 2);
+        CommitTree tree = CommitTree.load();
+        try {
+            tree.branch(args[1]);
+        } catch (Exception e) {
+            exitWithError(e.getMessage());
+            //e.printStackTrace();
+        }
     }
 
     /**
