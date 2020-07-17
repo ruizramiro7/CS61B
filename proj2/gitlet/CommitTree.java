@@ -7,9 +7,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Represents gitlet version history as a tree.
@@ -126,6 +124,58 @@ public class CommitTree implements Serializable {
         }
     }
 
+    public void checkoutByFileName(String fileName) throws Exception {
+
+    }
+
+    public void checkoutByCommitID() throws Exception {
+
+    }
+
+    public void checkoutBranch(String branchName) throws Exception {
+        if (!branches.containsKey(branchName)) {
+            throw new Exception("No such branch exists.");
+        }
+        else if (currentBranch == branchName) {
+            throw new Exception("No need to checkout the current branch.");
+        }
+        else if (getUntracked().size() > 0) {
+            throw new Exception("There is an untracked file in the way; " +
+                    "delete it, or add and commit it first.");
+        }
+        else {
+            currentBranch = branchName;
+        }
+    }
+
+    public LinkedList<String> getDeleted() {
+        LinkedList<String> deletedFiles = new LinkedList<>();
+        File file;
+        for (String fileName: head().references.keySet()) {
+            file = Utils.join(Main.CWD, fileName);
+            if (!file.exists()) {
+                deletedFiles.push(fileName);
+            }
+        }
+        return deletedFiles;
+    }
+
+    public LinkedList<String> getUntracked() {
+        LinkedList<String> untrackedFiles = new LinkedList<>();
+        File file;
+        for (String fileName: Main.CWD.list()) {
+            file = Utils.join(Main.CWD, fileName);
+            if (file.isDirectory()) {
+                continue;
+            }
+            if (!head().references.containsKey(fileName) &&
+                !staged.containsKey(fileName)) {
+                untrackedFiles.push(fileName);
+            }
+        }
+        return untrackedFiles;
+    }
+
     public void find() {
 
     }
@@ -144,6 +194,9 @@ public class CommitTree implements Serializable {
         }
         System.out.println("\n=== Removed Files ===");
         System.out.println("\n=== Modifications Not Staged for Commit ===");
+        for (String fileName: getUntracked()) {
+            System.out.println(fileName);
+        }
         System.out.println("\n=== Untracked Files ===");
         for (String fileName: Main.CWD.list()) {
             File f = Utils.join(Main.CWD, fileName);
