@@ -95,7 +95,7 @@ public class CommitTree implements Serializable {
     }
 
     //!// Should probably make head a method head() that uses currentBranch
-    private CommitNode head;
+    //private CommitNode head;
     private String currentBranch;
     // Branches should probably be a HashMap<BRANCH_NAME, COMMIT_NODE>
     private HashMap<String, CommitNode> branches = new HashMap<>();
@@ -124,6 +124,8 @@ public class CommitTree implements Serializable {
         }
     }
 
+    // Methods for checkout command
+    // ============================
     public void checkoutByFileName(String fileName) throws Exception {
 
     }
@@ -148,6 +150,8 @@ public class CommitTree implements Serializable {
         }
     }
 
+    // Methods for comparing working directory to head commit
+    // ======================================================
     public LinkedList<String> getDeleted() {
         LinkedList<String> deletedFiles = new LinkedList<>();
         File file;
@@ -158,6 +162,10 @@ public class CommitTree implements Serializable {
             }
         }
         return deletedFiles;
+    }
+
+    public LinkedList<String> getModified() {
+        return null;
     }
 
     public LinkedList<String> getUntracked() {
@@ -175,6 +183,7 @@ public class CommitTree implements Serializable {
         }
         return untrackedFiles;
     }
+    // ======================================================
 
     public void find() {
 
