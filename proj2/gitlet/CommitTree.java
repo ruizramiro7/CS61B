@@ -94,8 +94,6 @@ public class CommitTree implements Serializable {
 
     }
 
-    //!// Should probably make head a method head() that uses currentBranch
-    //private CommitNode head;
     private String currentBranch;
     // Branches should probably be a HashMap<BRANCH_NAME, COMMIT_NODE>
     private HashMap<String, CommitNode> branches = new HashMap<>();
@@ -320,6 +318,8 @@ public class CommitTree implements Serializable {
             try {
                 fileAsCopy.createNewFile();
                 Utils.writeContents(fileAsCopy,contents);
+                // We probably don't need the if statement
+                // since put just replaces the key anyways
                 if (staged.containsKey(f.getName())) {
                     staged.replace(f.getName(), id);
                 }
