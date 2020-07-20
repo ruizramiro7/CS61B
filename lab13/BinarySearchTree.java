@@ -10,15 +10,52 @@ public class BinarySearchTree<T extends Comparable<T>> extends BinaryTree<T> {
         this.root = root;
     }
 
+    private boolean containsHelper(TreeNode n, T key) {
+        switch (key.compareTo(n.item)) {
+            case 0:
+                return true;
+            case 1:
+                return n.right != null && containsHelper(n.right, key);
+            case -1:
+                return n.left != null && containsHelper(n.left, key);
+            default:
+                return false;
+        }
+    }
+
     /* Returns true if the BST contains the given KEY. */
     public boolean contains(T key) {
-        // TODO: YOUR CODE HERE
-        return false;
+        return containsHelper(root, key);
+    }
+
+    private void addHelper(TreeNode n, T key) {
+        switch (key.compareTo(n.item)) {
+            case 1:
+                if (n.right == null) {
+                    n.right = new TreeNode(key);
+                }
+                else {
+                    addHelper(n.right, key);
+                }
+                break;
+            case -1:
+                if (n.left == null) {
+                    n.left = new TreeNode(key);
+                }
+                else {
+                    addHelper(n.left, key);
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     /* Adds a node for KEY iff KEY isn't in the BST already. */
     public void add(T key) {
-        // TODO: YOUR CODE HERE
+        if (!contains(key)) {
+            addHelper(root, key);
+        }
     }
 
     /* Deletes a node from the BST. 
