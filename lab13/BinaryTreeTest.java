@@ -20,4 +20,5 @@ public class BinaryTreeTest {
         assertEquals("x in preorder\nC A B E D \nx in inorder\nA B C D E \n\n".trim(),
                      outContent.toString().trim());
     }
+
 }
