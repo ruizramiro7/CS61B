@@ -11,49 +11,52 @@ public class BinarySearchTree<T extends Comparable<T>> extends BinaryTree<T> {
     }
 
     private boolean containsHelper(TreeNode n, T key) {
-        switch (key.compareTo(n.item)) {
-            case 0:
-                return true;
-            case 1:
-                return n.right != null && containsHelper(n.right, key);
-            case -1:
-                return n.left != null && containsHelper(n.left, key);
-            default:
-                return false;
+        int comparison = key.compareTo(n.item);
+        if (comparison == 0) {
+            return true;
+        }
+        else if (comparison > 0) {
+            return n.right != null && containsHelper(n.right, key);
+        }
+        else {
+            return n.left != null && containsHelper(n.left, key);
         }
     }
 
     /* Returns true if the BST contains the given KEY. */
     public boolean contains(T key) {
+        if (root == null) {
+            return false;
+        }
         return containsHelper(root, key);
     }
 
     private void addHelper(TreeNode n, T key) {
-        switch (key.compareTo(n.item)) {
-            case 1:
-                if (n.right == null) {
-                    n.right = new TreeNode(key);
-                }
-                else {
-                    addHelper(n.right, key);
-                }
-                break;
-            case -1:
-                if (n.left == null) {
-                    n.left = new TreeNode(key);
-                }
-                else {
-                    addHelper(n.left, key);
-                }
-                break;
-            default:
-                break;
+        int comparison = key.compareTo(n.item);
+        if (comparison > 0) {
+            if (n.right == null) {
+                n.right = new TreeNode(key);
+            }
+            else {
+                addHelper(n.right, key);
+            }
+        }
+        else {
+            if (n.left == null) {
+                n.left = new TreeNode(key);
+            }
+            else {
+                addHelper(n.left, key);
+            }
         }
     }
 
     /* Adds a node for KEY iff KEY isn't in the BST already. */
     public void add(T key) {
-        if (!contains(key)) {
+        if (root == null) {
+            root = new TreeNode(key);
+        }
+        else if (!contains(key)) {
             addHelper(root, key);
         }
     }
