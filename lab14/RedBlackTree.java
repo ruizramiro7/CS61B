@@ -75,8 +75,17 @@ public class RedBlackTree<T extends Comparable<T>> {
     /* Rotates the given node NODE to the left. Returns the new root node of
        this subtree. */
     RBTreeNode<T> rotateLeft(RBTreeNode<T> node) {
-        // TODO: YOUR CODE HERE
-        return null;
+        if (node.right == null) {
+            return node;
+        }
+        else {
+            RBTreeNode<T> newRoot = node.right;
+            newRoot.isBlack = node.isBlack;
+            node.right = newRoot.left;
+            node.isBlack = false;
+            newRoot.left = node;
+            return newRoot;
+        }
     }
 
     public void insert(T item) {   
@@ -84,9 +93,52 @@ public class RedBlackTree<T extends Comparable<T>> {
         root.isBlack = true;    
     }
 
+    private void flipAllColors(RBTreeNode<T> node) {
+        if (node == null) {
+            return;
+        }
+        node.isBlack = !node.isBlack;
+    }
+
+    private RBTreeNode<T> restoreLLRB(RBTreeNode<T> node) {
+           if (node.left == null && isRed(node.right)) {
+               node = rotateLeft(node);
+           }
+           else if (isRed(node.right) && isRed(node.left)) {
+               flipColors(node);
+           }
+           else if (node.left != null && isRed(node.left) && isRed(node.left.left)) {
+               node = rotateRight(node);
+               flipColors(node);
+           }
+           else if (node.left != null && isRed(node.left) && isRed(node.left.right)) {
+               node.left = rotateLeft(node.left);
+               node = rotateRight(node);
+               flipColors(node);
+           }
+            return node;
+    }
+
     private RBTreeNode<T> insert(RBTreeNode<T> node, T item) {
-        // TODO: YOUR CODE HERE
-        return null;
+        int comparison = node.item.compareTo(item);
+        if (comparison > 0) {
+            if (node.right == null) {
+                node.right = new RBTreeNode<T>(false, item);
+            }
+            else {
+                node.right = insert(node.right, item);
+            }
+        }
+        else {
+            if (node.left == null) {
+                node.left = new RBTreeNode<T>(false, item);
+            }
+            else {
+                node.left = insert(node.left, item);
+            }
+        }
+        // fixNode(node)
+        return restoreLLRB(node);
     }
 
     /* Returns whether the given node NODE is red. Null nodes (children of leaf
@@ -117,6 +169,7 @@ public class RedBlackTree<T extends Comparable<T>> {
             this.left = left;
             this.right = right;
         }
+
     }
 
 }
