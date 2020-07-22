@@ -64,7 +64,9 @@ public class RedBlackTree<T extends Comparable<T>> {
         }
         else {
             RBTreeNode<T> newRoot = node.left;
+            newRoot.isBlack = node.isBlack;
             node.left = newRoot.right;
+            node.isBlack = false;
             newRoot.right = node;
             return newRoot;
         }
