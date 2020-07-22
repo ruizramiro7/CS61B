@@ -115,17 +115,17 @@ public class RedBlackTree<T extends Comparable<T>> {
         else if (compare < 0){
             node.left = insert(node.left ,item);
         }
-        else if (compare > 0) {
+        else {
             node.right = insert(node.right, item);
         }
 
-        // Case B
-        if (isRed(node.left) && !isRed(node.left.left)){
-            node = rotateRight(node);
-        }
         // Case C
-        if (isRed(node.left) && isRed(node.left.right)){
+        if (!isRed(node.left) && isRed(node.right)){
             node = rotateLeft(node);
+        }
+        //Case B
+        if (isRed(node.left) && isRed(node.left.left)){
+            node = rotateRight(node);
         }
         // Case A
         if (isRed(node.left) && isRed(node.right)){
