@@ -69,11 +69,11 @@ public class RedBlackTree<T extends Comparable<T>> {
             return node;
         }
         RBTreeNode temp = node.left.right;
-        RBTreeNode rotate = node.left; //set as the root
+        RBTreeNode rotate = node.left;//set as the root
+        rotate.isBlack = node.isBlack;
         rotate.right = node;
         node.left = temp;
-        rotate.isBlack = true;
-        rotate.right.isBlack = false;
+        node.isBlack = false;
 
         // TODO: YOUR CODE HERE
         return rotate;
@@ -90,10 +90,10 @@ public class RedBlackTree<T extends Comparable<T>> {
         }
         RBTreeNode temp = node.right.left;
         RBTreeNode rotate = node.right;
+        rotate.isBlack = node.isBlack;
         rotate.left = node;
         node.right = temp;
-        rotate.isBlack = true;
-        rotate.left.isBlack = false;
+        node.isBlack = false;
         // TODO: YOUR CODE HERE
         return rotate;
     }
@@ -104,8 +104,36 @@ public class RedBlackTree<T extends Comparable<T>> {
     }
 
     private RBTreeNode<T> insert(RBTreeNode<T> node, T item) {
+        if (node == null){
+            return new RBTreeNode<>(true, item);
+        }
+
+        int compare = item.compareTo(node.item);
+        if (compare == 0){
+            return node;
+        }
+        else if (compare < 0){
+            node.left = insert(node.left ,item);
+        }
+        else if (compare > 0) {
+            node.right = insert(node.right, item);
+        }
+
+        // Case B
+        if (isRed(node.left) && isRed(node.left.left)){
+            node = rotateRight(node);
+        }
+        // Case C
+        if (isRed(node.left) && isRed(node.left.right)){
+            node = rotateLeft(node.left);
+        }
+        // Case A
+        if (isRed(node.left) && isRed(node.right)){
+            flipColors(node);
+        }
+
         // TODO: YOUR CODE HERE
-        return null;
+        return node;
     }
 
     /* Returns whether the given node NODE is red. Null nodes (children of leaf
