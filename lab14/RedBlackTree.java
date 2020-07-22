@@ -105,7 +105,7 @@ public class RedBlackTree<T extends Comparable<T>> {
 
     private RBTreeNode<T> insert(RBTreeNode<T> node, T item) {
         if (node == null){
-            return new RBTreeNode<>(true, item);
+            return new RBTreeNode<>(false, item);
         }
 
         int compare = item.compareTo(node.item);

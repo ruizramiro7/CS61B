@@ -18,12 +18,14 @@ public class BST<T> {
             return null;
         }
         else if (N == 1){
-            return  tree.left;
+            tree.item = iter.next();
+        }else {
+            tree.item = iter.next();
+            tree.left = sortedIterToTree(iter,N/2);
+            tree.right = sortedIterToTree(iter, (N-1)/2);
         }
-
-
         // TODO: YOUR CODE HERE
-        return null;
+        return tree;
     }
 
     /* Prints the tree represented by ROOT. */
