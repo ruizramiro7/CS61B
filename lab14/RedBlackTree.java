@@ -120,6 +120,10 @@ public class RedBlackTree<T extends Comparable<T>> {
     }
 
     private RBTreeNode<T> insert(RBTreeNode<T> node, T item) {
+        if (root == null) {
+            return new RBTreeNode<T>(true, item);
+        }
+
         int comparison = node.item.compareTo(item);
         if (comparison > 0) {
             if (node.right == null) {
