@@ -110,42 +110,56 @@ public class CommitTree implements Serializable {
         return branches.get(currentBranch);
     }
 
-    public void checkout() {
+    private void switchToBranch(String branchName) {
         File workingFile;
         File commitFile;
-        for (String fileName: head().references.keySet()) {
-            String fileID = head().references.get(fileName);
+        CommitNode branch = branches.get(branchName);
+
+        // Copy and overwrite files from new branch into working directory
+        for (String fileName: branch.references.keySet()) {
+            String fileID = branch.references.get(fileName);
             commitFile = Utils.join(COMMITS, fileID);
             workingFile = Utils.join(Main.CWD, fileName);
             String contents = Utils.readContentsAsString(commitFile);
             Utils.writeContents(workingFile, contents);
         }
+
+        for (String fileName: Main.CWD.list()) {
+            workingFile = Utils.join(Main.CWD, fileName);
+            if (!workingFile.isDirectory()
+                    && !branch.references.containsKey(fileName)) {
+                workingFile.delete();
+            }
+        }
+        clearStagingArea();
     }
 
     // Methods for checkout command
     // ============================
-    public void checkoutByFileName(String fileName) throws Exception {
+    public void checkoutByFileName(String fileName) {
 
     }
 
-    public void checkoutByCommitID() throws Exception {
+    public void checkoutByCommitID(String id, String fileName) {
 
     }
 
-    public void checkoutBranch(String branchName) throws Exception {
+    public void checkoutBranch(String branchName) {
         if (!branches.containsKey(branchName)) {
-            throw new Exception("No such branch exists.");
+            throw new RuntimeException("No such branch exists.");
         }
         else if (currentBranch == branchName) {
-            throw new Exception("No need to checkout the current branch.");
+            throw new RuntimeException("No need to checkout the current branch.");
         }
         else if (getUntracked().size() > 0) {
-            throw new Exception("There is an untracked file in the way; " +
+            throw new RuntimeException("There is an untracked file in the way; " +
                     "delete it, or add and commit it first.");
         }
         else {
             currentBranch = branchName;
+            switchToBranch(branchName);
         }
+        save();
     }
 
     // Methods for comparing working directory to head commit
@@ -190,7 +204,7 @@ public class CommitTree implements Serializable {
     public void status() {
         System.out.println("=== Branches ===");
         for (String b: branches.keySet()) {
-            if (b == currentBranch) {
+            if (b.equals(currentBranch)) {
                 System.out.print("*");
             }
             System.out.println(b);
@@ -214,6 +228,15 @@ public class CommitTree implements Serializable {
                 System.out.println(fileName);
             }
         }
+    }
+
+    private void clearStagingArea() {
+        File f;
+        for (String fileName: staged.values()) {
+            f = Utils.join(STAGING_AREA, fileName);
+            f.delete();
+        }
+        staged.clear();
     }
 
     public void branch(String branchName) throws Exception {
@@ -279,9 +302,9 @@ public class CommitTree implements Serializable {
         }
 
         HashMap<String, String> newReferences = new HashMap<String, String>();
+        newReferences.putAll(head().references);
         newReferences.putAll(staged);
         staged.clear();
-        newReferences.putAll(head().references);
 
         // Create commit node with new data and update head().
         CommitNode newCommit = new CommitNode(

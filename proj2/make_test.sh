@@ -44,5 +44,20 @@ echo "java gitlet.Main branch testBranch"
 java gitlet.Main branch testBranch
 echo "java gitlet.Main status"
 java gitlet.Main status
-echo "Done"
+
+#echo "======================="
+#echo "TESTING BRANCH CHECKOUT"
+#echo "======================="
+#java gitlet.Main checkout testBranch
+#touch text2.txt
+#java gitlet.Main add text2.txt
+#java gitlet.Main commit "Added text2.txt"
+#echo "Before:"
+#ls
+#echo "After:"
+#java gitlet.Main checkout master
+#ls
+
+# ======================================
+echo "DONE"
 cd ..

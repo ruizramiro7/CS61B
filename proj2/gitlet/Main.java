@@ -142,9 +142,21 @@ public class Main {
     }
 
     public static void checkout(String... args) {
-        validateNumArgs(args, 1);
         CommitTree tree = CommitTree.load();
-        tree.checkout();
+        switch (args.length) {
+            case 2:
+                tree.checkoutBranch(args[1]);
+                break;
+            case 3:
+                tree.checkoutByFileName(args[2]);
+                break;
+            case 4:
+                tree.checkoutByCommitID(args[1], args[3]);
+                break;
+            default:
+                throw new RuntimeException(
+                        String.format("Incorrect operands."));
+        }
     }
 
     public static void branch(String... args) {
