@@ -13,8 +13,19 @@ public class BST<T> {
        iterator ITER  of N items. ITER will output the items in sorted order,
        and ITER will contain objects that will be the item of each BSTNode. */
     private BSTNode<T> sortedIterToTree(Iterator<T> iter, int N) {
+        BSTNode tree = new BSTNode(null);
+        if(N == 0){
+            return null;
+        }
+        else if (N == 1){
+            return new BSTNode<>(iter.next());
+        }
+        tree.item = iter.next();
+        tree.left = sortedIterToTree(iter,N/2);
+        tree.right = sortedIterToTree(iter, (N -1)/2);
         // TODO: YOUR CODE HERE
-        return null;
+
+        return tree;
     }
 
     /* Prints the tree represented by ROOT. */
