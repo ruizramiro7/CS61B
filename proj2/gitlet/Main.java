@@ -36,6 +36,7 @@ public class Main {
                 commit(args);
                 break;
             case "rm":
+                rm(args);
                 break;
             case "log":
                 log(args);
@@ -55,6 +56,7 @@ public class Main {
                 branch(args);
                 break;
             case "rm-branch":
+                removeBranch(args);
                 break;
             case "reset":
                 break;
@@ -125,6 +127,12 @@ public class Main {
         tree.commit(args[1]);
     }
 
+    public static void rm(String... args) {
+        validateNumArgs(args, 2);
+        CommitTree tree = CommitTree.load();
+        tree.remove(args[1]);
+    }
+
     public static void log(String... args) {
         validateNumArgs(args, 1);
         CommitTree tree = CommitTree.load();
@@ -168,6 +176,12 @@ public class Main {
             exitWithError(e.getMessage());
             //e.printStackTrace();
         }
+    }
+
+    public static void removeBranch(String... args) {
+        validateNumArgs(args, 2);
+        CommitTree tree = CommitTree.load();
+        tree.removeBranch(args[1]);
     }
 
     /**

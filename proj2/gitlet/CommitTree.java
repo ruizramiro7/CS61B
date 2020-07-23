@@ -99,10 +99,11 @@ public class CommitTree implements Serializable {
     private HashMap<String, CommitNode> branches = new HashMap<>();
     // Holds the references to blobs containing 1) the file name 2) the unique id
     private HashMap<String, String> staged = new HashMap<>();
+    private LinkedList<String> toRemove = new LinkedList<String>();
 
     public CommitTree() {
-        CommitNode newHead = new CommitNode("initial commit", new Date(0), null);
-        branches.put("master", newHead);
+        CommitNode root = new CommitNode("initial commit", new Date(0), null);
+        branches.put("master", root);
         currentBranch = "master";
     }
 
@@ -134,10 +135,31 @@ public class CommitTree implements Serializable {
         clearStagingArea();
     }
 
+    public void removeBranch(String branchName) {
+        if (!branches.containsKey(branchName)) {
+            throw new RuntimeException(
+                    "A branch with that name does not exist.");
+        }
+        else if (branchName.equals(currentBranch)) {
+            throw new RuntimeException(
+                    "Cannot remove the current branch.");
+        }
+        else {
+            branches.remove(branchName);
+        }
+        save();
+    }
+
     // Methods for checkout command
     // ============================
     public void checkoutByFileName(String fileName) {
-
+        if (!head().references.containsKey(fileName)) {
+            throw new RuntimeException("File does not exist in that commit.");
+        }
+        File workingFile = Utils.join(Main.CWD, fileName);
+        File commitFile = Utils.join(COMMITS, head().references.get(fileName));
+        String contents = Utils.readContentsAsString(commitFile);
+        Utils.writeContents(workingFile, contents);
     }
 
     public void checkoutByCommitID(String id, String fileName) {
@@ -276,6 +298,49 @@ public class CommitTree implements Serializable {
         }
     }
 
+    public CommitNode findSplitPoint(CommitNode A, CommitNode B) {
+
+        int dateDiff = A.timestamp.compareTo(B.timestamp);
+       while (A != null && B != null) {
+           if (A == B) {
+               return A;
+           }
+
+           if (dateDiff < 0) {
+               B = B.parent;
+           }
+           else {
+               A = A.parent;
+           }
+
+       }
+       return null;
+
+    }
+
+
+
+    public void printGlobalLog() {
+        HashMap<String, CommitNode> nodes = new HashMap<String, CommitNode>();
+        for (String s: branches.keySet()) {
+            nodes.put(s, branches.get(s));
+        }
+        String latest = "master";
+        int comparison;
+        while (latest != null) {
+           for (String n: nodes.keySet())  {
+               comparison = nodes.get(n).timestamp
+                       .compareTo(nodes.get(latest).timestamp);
+               if (comparison > 0) {
+                  latest = n;
+               }
+           }
+
+           System.out.println(nodes.get(latest).toString());
+        }
+
+    }
+
     /**
      * Creates a new commit node by overwriting parent commit with new changes.
      * @param message The commit message that should be displayed with the
@@ -303,6 +368,12 @@ public class CommitTree implements Serializable {
 
         HashMap<String, String> newReferences = new HashMap<String, String>();
         newReferences.putAll(head().references);
+        // Apply staged removals
+        for (String r: toRemove) {
+            newReferences.remove(r);
+        }
+        toRemove.clear();
+        // Apply staged additions/modifications;
         newReferences.putAll(staged);
         staged.clear();
 
@@ -315,6 +386,18 @@ public class CommitTree implements Serializable {
         newCommit.parent = head();
         //head = newCommit;
         branches.replace(currentBranch, newCommit);
+        save();
+    }
+
+    public void remove(String fileName) {
+        File fileToRemove = Utils.join(Main.CWD, fileName);
+        fileToRemove.delete();
+        toRemove.push(fileName);
+        if (staged.containsKey(fileName)) {
+            File stagedFile = Utils.join(STAGING_AREA, staged.get(fileName));
+            stagedFile.delete();
+            staged.remove(fileName);
+        }
         save();
     }
 
