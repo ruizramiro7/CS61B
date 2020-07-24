@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Represents gitlet version history as a tree.
@@ -35,6 +36,7 @@ public class CommitTree implements Serializable {
         private String id;
         private HashMap<String, String> references;
         public CommitNode parent;
+        public List<CommitNode> children;
 
         /**
          * @param message the commit message that displays when using gitet log
@@ -45,6 +47,7 @@ public class CommitTree implements Serializable {
 
             this.message = message;
             this.timestamp = timestamp;
+            this.children = new LinkedList<>();
             if (references == null) {
                this.references = new HashMap<>();
             }
@@ -78,6 +81,13 @@ public class CommitTree implements Serializable {
             return s;
         }
 
+        public void printAll() {
+            for (CommitNode n: children) {
+                n.printAll();
+            }
+            System.out.println(this);
+        }
+
         /**
          * Returns whether or not the current commit has saved a version of a file.
          * @param name the filename as it appears in the local workspace.
@@ -92,17 +102,22 @@ public class CommitTree implements Serializable {
             return false;
         }
 
+        public void addChild(CommitNode node) {
+            node.parent = this;
+            children.add(node);
+        }
+
     }
 
     private String currentBranch;
-    // Branches should probably be a HashMap<BRANCH_NAME, COMMIT_NODE>
     private HashMap<String, CommitNode> branches = new HashMap<>();
     // Holds the references to blobs containing 1) the file name 2) the unique id
     private HashMap<String, String> staged = new HashMap<>();
     private LinkedList<String> toRemove = new LinkedList<String>();
+    private CommitNode root;
 
     public CommitTree() {
-        CommitNode root = new CommitNode("initial commit", new Date(0), null);
+        root = new CommitNode("initial commit", new Date(0), null);
         branches.put("master", root);
         currentBranch = "master";
     }
@@ -125,13 +140,15 @@ public class CommitTree implements Serializable {
             Utils.writeContents(workingFile, contents);
         }
 
-        for (String fileName: Main.CWD.list()) {
-            workingFile = Utils.join(Main.CWD, fileName);
-            if (!workingFile.isDirectory()
-                    && !branch.references.containsKey(fileName)) {
-                workingFile.delete();
-            }
-        }
+        // Delete file that are not tracked by the new branch
+        deleteUntrackedFiles(branch);
+        //for (String fileName: Main.CWD.list()) {
+        //    workingFile = Utils.join(Main.CWD, fileName);
+        //    if (!workingFile.isDirectory()
+        //            && !branch.references.containsKey(fileName)) {
+        //        workingFile.delete();
+        //    }
+        //}
         clearStagingArea();
     }
 
@@ -148,6 +165,26 @@ public class CommitTree implements Serializable {
             branches.remove(branchName);
         }
         save();
+    }
+
+    public void deleteUntrackedFiles(CommitNode node) {
+        File workingFile;
+        for (String fileName: Main.CWD.list()) {
+            workingFile = Utils.join(Main.CWD, fileName);
+            if (!workingFile.isDirectory()
+                    && !node.references.containsKey(fileName)) {
+                workingFile.delete();
+            }
+        }
+    }
+
+    public void reset(String id) {
+        //deleteUntrackedFiles();
+
+    }
+
+    private CommitNode findCommit(String id) {
+        return null;
     }
 
     // Methods for checkout command
@@ -191,15 +228,28 @@ public class CommitTree implements Serializable {
         File file;
         for (String fileName: head().references.keySet()) {
             file = Utils.join(Main.CWD, fileName);
-            if (!file.exists()) {
+            if (!file.exists() && !toRemove.contains(fileName)) {
                 deletedFiles.push(fileName);
             }
         }
         return deletedFiles;
     }
 
-    public LinkedList<String> getModified() {
-        return null;
+    public LinkedList<String> getChanged() {
+        LinkedList<String> modifiedFiles = new LinkedList<>();
+        File file;
+        for (String fileName: Main.CWD.list()) {
+            file = Utils.join(Main.CWD, fileName);
+            if (file.isDirectory()) {
+                continue;
+            }
+            String contents = Utils.readContentsAsString(file);
+            if (head().references.containsKey(fileName)
+                    && !head().references.get(fileName).equals(Utils.sha1(fileName + contents))) {
+                modifiedFiles.push(fileName);
+            }
+        }
+        return modifiedFiles;
     }
 
     public LinkedList<String> getUntracked() {
@@ -217,6 +267,27 @@ public class CommitTree implements Serializable {
         }
         return untrackedFiles;
     }
+
+    public LinkedList<String> getModified() {
+        LinkedList modified = new LinkedList<>();
+        for (String fileName: getDeleted()) {
+            modified.add(fileName + " (deleted)");
+        }
+        for (String fileName: getChanged()) {
+            modified.add(fileName + " (modified)");
+        }
+        return modified;
+    }
+
+    public void printBranches() {
+        for (String b: branches.keySet().stream().sorted().collect(Collectors.toList())) {
+            if (b.equals(currentBranch)) {
+                System.out.print("*");
+            }
+            System.out.println(b);
+        }
+    }
+
     // ======================================================
 
     public void find() {
@@ -225,30 +296,20 @@ public class CommitTree implements Serializable {
 
     public void status() {
         System.out.println("=== Branches ===");
-        for (String b: branches.keySet()) {
-            if (b.equals(currentBranch)) {
-                System.out.print("*");
-            }
-            System.out.println(b);
-        }
+        printBranches();
         System.out.println("\n=== Staged Files ===");
-        for (String r: staged.keySet()) {
-            System.out.println(r);
-        }
+        printStrings(staged.keySet().stream().sorted().collect(Collectors.toList()));
         System.out.println("\n=== Removed Files ===");
+        printStrings(toRemove.stream().sorted().collect(Collectors.toList()));
         System.out.println("\n=== Modifications Not Staged for Commit ===");
-        for (String fileName: getUntracked()) {
-            System.out.println(fileName);
-        }
+        printStrings(getModified().stream().sorted().collect(Collectors.toList()));
         System.out.println("\n=== Untracked Files ===");
-        for (String fileName: Main.CWD.list()) {
-            File f = Utils.join(Main.CWD, fileName);
-            if (f.isDirectory()) {
-                continue;
-            }
-            else if (!head().references.containsKey(fileName)){
-                System.out.println(fileName);
-            }
+        printStrings(getUntracked().stream().sorted().collect(Collectors.toList()));
+    }
+
+    private void printStrings(List<String> list) {
+        for (String s: list) {
+            System.out.println(s);
         }
     }
 
@@ -318,28 +379,10 @@ public class CommitTree implements Serializable {
 
     }
 
-
-
     public void printGlobalLog() {
-        HashMap<String, CommitNode> nodes = new HashMap<String, CommitNode>();
-        for (String s: branches.keySet()) {
-            nodes.put(s, branches.get(s));
-        }
-        String latest = "master";
-        int comparison;
-        while (latest != null) {
-           for (String n: nodes.keySet())  {
-               comparison = nodes.get(n).timestamp
-                       .compareTo(nodes.get(latest).timestamp);
-               if (comparison > 0) {
-                  latest = n;
-               }
-           }
-
-           System.out.println(nodes.get(latest).toString());
-        }
-
+        root.printAll();
     }
+
 
     /**
      * Creates a new commit node by overwriting parent commit with new changes.
@@ -383,7 +426,7 @@ public class CommitTree implements Serializable {
                                     new Date(System.currentTimeMillis()),
                                     newReferences);
         // Red line in IntelliJ but still compiles?
-        newCommit.parent = head();
+        head().addChild(newCommit);
         //head = newCommit;
         branches.replace(currentBranch, newCommit);
         save();

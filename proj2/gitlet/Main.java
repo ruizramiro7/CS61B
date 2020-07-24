@@ -42,6 +42,7 @@ public class Main {
                 log(args);
                 break;
             case "global-log":
+                globalLog(args);
                 break;
             case "find":
                 find(args);
@@ -139,6 +140,12 @@ public class Main {
         tree.printLog();
     }
 
+    public static void globalLog(String... args) {
+        validateNumArgs(args, 1);
+        CommitTree tree = CommitTree.load();
+        tree.printGlobalLog();
+    }
+
     public static void find(String... args) {
         validateNumArgs(args, 2);
     }
@@ -182,6 +189,12 @@ public class Main {
         validateNumArgs(args, 2);
         CommitTree tree = CommitTree.load();
         tree.removeBranch(args[1]);
+    }
+
+    public static void reset(String... args) {
+        validateNumArgs(args, 2);
+        CommitTree tree = CommitTree.load();
+        tree.reset(args[1]);
     }
 
     /**
