@@ -148,6 +148,8 @@ public class Main {
 
     public static void find(String... args) {
         validateNumArgs(args, 2);
+        CommitTree tree = CommitTree.load();
+        tree.printCommitsWithMessage(args[1]);
     }
 
     public static void status(String... args) {

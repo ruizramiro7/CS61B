@@ -26,6 +26,7 @@ public class CommitTree implements Serializable {
     static final File COMMIT_LOG = Utils.join(Main.METADATA_DIR, "commit.dat");
     static final File STAGING_AREA = Utils.join(Main.METADATA_DIR, "stage");
     static final File COMMITS = Utils.join(Main.METADATA_DIR, "commits");
+    static final int SEARCH_PRECISION = 7;
 
     /**
      * Represents a single commit in the version history.
@@ -107,6 +108,37 @@ public class CommitTree implements Serializable {
             children.add(node);
         }
 
+        public void findCommitsWithMessage(String message, LinkedList<String> ids) {
+            if (this.message.equals(message)) {
+                ids.push(this.id);
+            }
+            for (CommitNode n: children) {
+                n.findCommitsWithMessage(message, ids);
+            }
+        }
+
+        /**
+         * @source https://stackoverflow.com/questions/2261697/compare-first-three-characters-of-two-strings
+         * @param id
+         * @param precision
+         * @return
+         */
+        public CommitNode findCommit(String id, int precision) {
+            if (id.length() < precision) {
+                Main.exitWithError("You must supply an id of length " + SEARCH_PRECISION + "or longer.");
+            }
+            if (this.id.startsWith(id.substring(0, precision - 1))) {
+                return this;
+            }
+            for (var n: children) {
+                CommitNode candidate = n.findCommit(id, precision);
+                if (candidate != null) {
+                    return candidate;
+                }
+            }
+            return null;
+        }
+
     }
 
     private String currentBranch;
@@ -115,6 +147,7 @@ public class CommitTree implements Serializable {
     private HashMap<String, String> staged = new HashMap<>();
     private LinkedList<String> toRemove = new LinkedList<String>();
     private CommitNode root;
+    private CommitNode head;
 
     public CommitTree() {
         root = new CommitNode("initial commit", new Date(0), null);
@@ -126,14 +159,13 @@ public class CommitTree implements Serializable {
         return branches.get(currentBranch);
     }
 
-    private void switchToBranch(String branchName) {
+    private void resetToCommit(CommitNode node) {
         File workingFile;
         File commitFile;
-        CommitNode branch = branches.get(branchName);
 
         // Copy and overwrite files from new branch into working directory
-        for (String fileName: branch.references.keySet()) {
-            String fileID = branch.references.get(fileName);
+        for (String fileName: node.references.keySet()) {
+            String fileID = node.references.get(fileName);
             commitFile = Utils.join(COMMITS, fileID);
             workingFile = Utils.join(Main.CWD, fileName);
             String contents = Utils.readContentsAsString(commitFile);
@@ -141,7 +173,7 @@ public class CommitTree implements Serializable {
         }
 
         // Delete file that are not tracked by the new branch
-        deleteUntrackedFiles(branch);
+        deleteUntrackedFiles(node);
         //for (String fileName: Main.CWD.list()) {
         //    workingFile = Utils.join(Main.CWD, fileName);
         //    if (!workingFile.isDirectory()
@@ -180,26 +212,34 @@ public class CommitTree implements Serializable {
 
     public void reset(String id) {
         //deleteUntrackedFiles();
-
     }
 
     private CommitNode findCommit(String id) {
-        return null;
+        return root.findCommit(id, SEARCH_PRECISION);
+    }
+
+    private void checkoutFile(String fileName, CommitNode node) {
+        if (!node.references.containsKey(fileName)) {
+            throw new RuntimeException("File does not exist in that commit.");
+        }
+        File workingFile = Utils.join(Main.CWD, fileName);
+        File commitFile = Utils.join(COMMITS, node.references.get(fileName));
+        String contents = Utils.readContentsAsString(commitFile);
+        Utils.writeContents(workingFile, contents);
     }
 
     // Methods for checkout command
     // ============================
     public void checkoutByFileName(String fileName) {
-        if (!head().references.containsKey(fileName)) {
-            throw new RuntimeException("File does not exist in that commit.");
-        }
-        File workingFile = Utils.join(Main.CWD, fileName);
-        File commitFile = Utils.join(COMMITS, head().references.get(fileName));
-        String contents = Utils.readContentsAsString(commitFile);
-        Utils.writeContents(workingFile, contents);
+        checkoutFile(fileName, head());
     }
 
     public void checkoutByCommitID(String id, String fileName) {
+        CommitNode node = findCommit(id);
+        if (node == null) {
+            Main.exitWithError("No commit with that id exists.");
+        }
+        checkoutFile(fileName, node);
 
     }
 
@@ -216,7 +256,7 @@ public class CommitTree implements Serializable {
         }
         else {
             currentBranch = branchName;
-            switchToBranch(branchName);
+            resetToCommit(branches.get(branchName));
         }
         save();
     }
@@ -288,11 +328,19 @@ public class CommitTree implements Serializable {
         }
     }
 
+    public void printCommitsWithMessage(String message)  {
+        LinkedList<String> commitIds = new LinkedList<>();
+        root.findCommitsWithMessage(message, commitIds);
+        if (commitIds.size() == 0) {
+            Main.exitWithError("Found no commit with that message.");
+        }
+        for (var id: commitIds) {
+            System.out.println(id);
+        }
+    }
+
     // ======================================================
 
-    public void find() {
-
-    }
 
     public void status() {
         System.out.println("=== Branches ===");
