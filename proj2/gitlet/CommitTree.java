@@ -432,6 +432,10 @@ public class CommitTree implements Serializable {
         root.printAll();
     }
 
+    public void rebase() {
+        
+    }
+
 
     /**
      * Creates a new commit node by overwriting parent commit with new changes.
