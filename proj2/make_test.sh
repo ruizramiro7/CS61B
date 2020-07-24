@@ -59,5 +59,21 @@ java gitlet.Main status
 #ls
 
 # ======================================
+echo "=============="
+echo "TESTING REBASE"
+echo "=============="
+
+echo "m" >> master.txt
+java gitlet.Main add master.txt
+java gitlet.Main commit "Added master.txt"
+java gitlet.Main checkout testBranch
+echo "m" >> testBranch.txt
+java gitlet.Main add testBranch.txt
+java gitlet.Main commit "Added testBranch.txt"
+java gitlet.Main log
+java gitlet.Main rebase master
+java gitlet.Main checkout master
+java gitlet.Main log
+
 echo "DONE"
 cd ..

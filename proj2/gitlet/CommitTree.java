@@ -108,6 +108,21 @@ public class CommitTree implements Serializable {
             children.add(node);
         }
 
+        public CommitNode duplicate() {
+            HashMap<String, String> copyRefs = new HashMap<String, String>();
+            copyRefs.putAll(this.references);
+            return new CommitNode(this.message, new Date(System.currentTimeMillis()), copyRefs);
+        }
+
+        public CommitNode mergeChild(CommitNode node) {
+            HashMap<String, String> copyRefs = new HashMap<>();
+            copyRefs.putAll(this.references);
+            copyRefs.putAll(node.references);
+            node.references = copyRefs;
+            addChild(node);
+            return node;
+        }
+
         public void findCommitsWithMessage(String message, LinkedList<String> ids) {
             if (this.message.equals(message)) {
                 ids.push(this.id);
@@ -137,6 +152,14 @@ public class CommitTree implements Serializable {
                 }
             }
             return null;
+        }
+
+        public void getHistory(CommitNode splitPoint, LinkedList<CommitNode> list) {
+            if (splitPoint == this || this == null) {
+                return;
+            }
+            list.push(this);
+            parent.getHistory(splitPoint, list);
         }
 
     }
@@ -410,8 +433,8 @@ public class CommitTree implements Serializable {
 
     public CommitNode findSplitPoint(CommitNode A, CommitNode B) {
 
-        int dateDiff = A.timestamp.compareTo(B.timestamp);
        while (A != null && B != null) {
+           int dateDiff = A.timestamp.compareTo(B.timestamp);
            if (A == B) {
                return A;
            }
@@ -432,8 +455,17 @@ public class CommitTree implements Serializable {
         root.printAll();
     }
 
-    public void rebase() {
-        
+    public void rebase(String branchName) {
+        LinkedList<CommitNode> history = new LinkedList<>();
+        CommitNode anchorPoint = branches.get(branchName);
+        CommitNode splitPoint = findSplitPoint(head(), anchorPoint);
+        head().getHistory(splitPoint, history);
+        CommitNode current = branches.get(branchName);
+        while (history.size() > 0) {
+            current = current.mergeChild(history.pop().duplicate());
+        }
+        branches.replace(branchName, current);
+        save();
     }
 
 

@@ -65,6 +65,7 @@ public class Main {
             case "merge":
                 break;
             case "rebase":
+                rebase(args);
                 break;
             default:
                 exitWithError("No command with that name exists.");
@@ -198,6 +199,13 @@ public class Main {
         validateNumArgs(args, 2);
         CommitTree tree = CommitTree.load();
         tree.reset(args[1]);
+    }
+
+    public static void rebase(String... args) {
+        validateNumArgs(args, 2);
+        CommitTree tree = CommitTree.load();
+        tree.rebase(args[1]);
+
     }
 
     /**
