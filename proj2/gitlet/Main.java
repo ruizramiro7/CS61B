@@ -60,6 +60,7 @@ public class Main {
                 removeBranch(args);
                 break;
             case "reset":
+                reset(args);
                 break;
             case "merge":
                 break;

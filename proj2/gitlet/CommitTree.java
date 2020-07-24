@@ -147,7 +147,6 @@ public class CommitTree implements Serializable {
     private HashMap<String, String> staged = new HashMap<>();
     private LinkedList<String> toRemove = new LinkedList<String>();
     private CommitNode root;
-    private CommitNode head;
 
     public CommitTree() {
         root = new CommitNode("initial commit", new Date(0), null);
@@ -182,6 +181,7 @@ public class CommitTree implements Serializable {
         //    }
         //}
         clearStagingArea();
+        branches.replace(currentBranch, node);
     }
 
     public void removeBranch(String branchName) {
@@ -211,7 +211,8 @@ public class CommitTree implements Serializable {
     }
 
     public void reset(String id) {
-        //deleteUntrackedFiles();
+       resetToCommit(findCommit(id));
+       save();
     }
 
     private CommitNode findCommit(String id) {
