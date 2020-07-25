@@ -82,6 +82,9 @@ public class CommitTree implements Serializable {
             return s;
         }
 
+        /**
+         * Prints all commits mades.
+         */
         public void printAll() {
             for (CommitNode n: children) {
                 n.printAll();
@@ -94,7 +97,7 @@ public class CommitTree implements Serializable {
          * @param name the filename as it appears in the local workspace.
          * @param id the id of the file as determine by a SHA-1 conversion of the
          *           file name + file contents.
-         * @return
+         * @return true if it contains the file, false if it doesn't
          */
         public boolean contains(String name, String id) {
             if (references.containsKey(name)) {
@@ -123,6 +126,11 @@ public class CommitTree implements Serializable {
             return node;
         }
 
+        /**
+         * Finds the commit by looking up the message.
+         * @param message String of the message
+         * @param ids takes a linkedlist composed of strings used as commit messages.
+         */
         public void findCommitsWithMessage(String message, LinkedList<String> ids) {
             if (this.message.equals(message)) {
                 ids.push(this.id);
@@ -154,6 +162,11 @@ public class CommitTree implements Serializable {
             return null;
         }
 
+        /**
+         * Keep track of all Commit nodes that are parent of the other.
+         * @param splitPoint Commit in branch.
+         * @param list List of all related commit nodes
+         */
         public void getHistory(CommitNode splitPoint, LinkedList<CommitNode> list) {
             if (splitPoint == this || this == null) {
                 return;
@@ -177,6 +190,10 @@ public class CommitTree implements Serializable {
         currentBranch = "master";
     }
 
+    /**
+     * The head points to the current branch.
+     * @return What the current Commit the head is at.
+     */
     private CommitNode head() {
         return branches.get(currentBranch);
     }
@@ -222,6 +239,10 @@ public class CommitTree implements Serializable {
         save();
     }
 
+    /**
+     * Deletes any untracked files
+     * @param node Takes node and deletes any untracked file
+     */
     public void deleteUntrackedFiles(CommitNode node) {
         File workingFile;
         for (String fileName: Main.CWD.list()) {
@@ -233,15 +254,31 @@ public class CommitTree implements Serializable {
         }
     }
 
+    /**
+     * Resets to the commit by taking in the ID of
+     * commit they want to reset to.
+     * @param id String of a commit's id
+     */
     public void reset(String id) {
        resetToCommit(findCommit(id));
        save();
     }
 
+    /**
+     * Helper to findCommit, finds the first 7 digits if the SHA1 of
+     * the commit
+     * @param id string of the commit's ID
+     * @return Finds the commit with the matching ID
+     */
     private CommitNode findCommit(String id) {
         return root.findCommit(id, SEARCH_PRECISION);
     }
 
+    /**
+     *
+     * @param fileName
+     * @param node
+     */
     private void checkoutFile(String fileName, CommitNode node) {
         if (!node.references.containsKey(fileName)) {
             throw new RuntimeException("File does not exist in that commit.");
@@ -385,6 +422,9 @@ public class CommitTree implements Serializable {
         }
     }
 
+    /**
+     * Deletes everything in the staging area.
+     */
     private void clearStagingArea() {
         File f;
         for (String fileName: staged.values()) {
@@ -394,6 +434,11 @@ public class CommitTree implements Serializable {
         staged.clear();
     }
 
+    /**
+     * Creates a branch and stores its name into branches.
+     * @param branchName String of branchname
+     * @throws Exception if branch name already exists.
+     */
     public void branch(String branchName) throws Exception {
         if (branches.containsKey(branchName)) {
             throw new Exception("A branch with that name already exists");
@@ -431,6 +476,12 @@ public class CommitTree implements Serializable {
         }
     }
 
+    /**
+     * Finds the split point of two commit nodes in different branches.
+     * @param A
+     * @param B
+     * @return
+     */
     public CommitNode findSplitPoint(CommitNode A, CommitNode B) {
 
        while (A != null && B != null) {
@@ -517,6 +568,10 @@ public class CommitTree implements Serializable {
         save();
     }
 
+    /**
+     * Removes the file from the directory completley.
+     * @param fileName Takes in a string of the file name.
+     */
     public void remove(String fileName) {
         File fileToRemove = Utils.join(Main.CWD, fileName);
         fileToRemove.delete();
