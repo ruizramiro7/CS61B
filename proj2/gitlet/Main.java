@@ -63,6 +63,7 @@ public class Main {
                 reset(args);
                 break;
             case "merge":
+                merge(args);
                 break;
             case "rebase":
                 rebase(args);
@@ -199,6 +200,11 @@ public class Main {
         validateNumArgs(args, 2);
         CommitTree tree = CommitTree.load();
         tree.reset(args[1]);
+    }
+
+    public static void merge(String... args){
+        validateNumArgs(args,1);
+        CommitTree tree = CommitTree.load();
     }
 
     public static void rebase(String... args) {
