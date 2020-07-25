@@ -168,14 +168,19 @@ public class Main {
                 tree.checkoutBranch(args[1]);
                 break;
             case 3:
+                if (args[1] != "--") {
+                    exitWithError("Incorrect operands.");
+                }
                 tree.checkoutByFileName(args[2]);
                 break;
             case 4:
+                if (args[2] != "--") {
+                    exitWithError("Incorrect operands.");
+                }
                 tree.checkoutByCommitID(args[1], args[3]);
                 break;
             default:
-                throw new RuntimeException(
-                        String.format("Incorrect operands."));
+                exitWithError("Incorrect operands.");
         }
     }
 

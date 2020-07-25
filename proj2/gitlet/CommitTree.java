@@ -414,9 +414,9 @@ public class CommitTree implements Serializable {
         System.out.println("\n=== Removed Files ===");
         printStrings(toRemove.stream().sorted().collect(Collectors.toList()));
         System.out.println("\n=== Modifications Not Staged for Commit ===");
-        printStrings(getModified().stream().sorted().collect(Collectors.toList()));
+        //printStrings(getModified().stream().sorted().collect(Collectors.toList()));
         System.out.println("\n=== Untracked Files ===");
-        printStrings(getUntracked().stream().sorted().collect(Collectors.toList()));
+        //printStrings(getUntracked().stream().sorted().collect(Collectors.toList()));
         System.out.println("");
     }
 
