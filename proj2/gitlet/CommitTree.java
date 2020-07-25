@@ -417,6 +417,7 @@ public class CommitTree implements Serializable {
         printStrings(getModified().stream().sorted().collect(Collectors.toList()));
         System.out.println("\n=== Untracked Files ===");
         printStrings(getUntracked().stream().sorted().collect(Collectors.toList()));
+        System.out.println("");
     }
 
     private void printStrings(List<String> list) {
