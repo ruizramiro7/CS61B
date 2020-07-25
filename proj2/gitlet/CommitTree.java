@@ -151,6 +151,9 @@ public class CommitTree implements Serializable {
             if (id.length() < precision) {
                 Main.exitWithError("You must supply an id of length " + SEARCH_PRECISION + "or longer.");
             }
+            if (id.length() > precision) {
+                precision = id.length();
+            }
             if (this.id.startsWith(id.substring(0, precision - 1))) {
                 return this;
             }
@@ -411,9 +414,9 @@ public class CommitTree implements Serializable {
         System.out.println("\n=== Removed Files ===");
         printStrings(toRemove.stream().sorted().collect(Collectors.toList()));
         System.out.println("\n=== Modifications Not Staged for Commit ===");
-        //printStrings(getModified().stream().sorted().collect(Collectors.toList()));
+        printStrings(getModified().stream().sorted().collect(Collectors.toList()));
         System.out.println("\n=== Untracked Files ===");
-        //printStrings(getUntracked().stream().sorted().collect(Collectors.toList()));
+        printStrings(getUntracked().stream().sorted().collect(Collectors.toList()));
     }
 
     private void printStrings(List<String> list) {
