@@ -33,6 +33,7 @@ public class CommitTree implements Serializable {
      */
     public class CommitNode implements Serializable {
         private String message;
+        private String merges = "";
         private Date timestamp;
         private String id;
         private HashMap<String, String> references;
@@ -75,9 +76,14 @@ public class CommitTree implements Serializable {
             SimpleDateFormat format
                     = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z");
             String date = format.format(timestamp);
+            String mergeText = "";
+            if (!merges.equals("")) {
+                mergeText = "Merge: " + merges + "\n";
+            }
             String s = "";
             s += "===\n"
               + "commit " + id + "\n"
+              + mergeText
               + "Date: " + date + "\n"
               + message + "\n\n";
             return s;
@@ -311,7 +317,7 @@ public class CommitTree implements Serializable {
         if (!branches.containsKey(branchName)) {
             Main.exitWithError("No such branch exists.");
         }
-        else if (currentBranch == branchName) {
+        else if (currentBranch.equals(branchName)) {
             Main.exitWithError("No need to checkout the current branch.");
         }
         else if (getUntracked().size() > 0) {
@@ -533,6 +539,39 @@ public class CommitTree implements Serializable {
         save();
     }
 
+    private boolean checkRefs(HashMap<String, String> A, HashMap<String, String> B, String v) {
+        if (A.get(v) == null || B.get(v) == null) {
+            return A.get(v) == null && B.get(v) == null;
+        }
+        return A.get(v).equals(B.get(v));
+    }
+
+    private void handleMergeConflicts(HashSet<String> conflicts, HashMap<String, String> to,
+                                      HashMap<String, String> from, HashMap<String, String> nw) {
+
+        File toFile;
+        File fromFile;
+        File mergeFile;
+        File workingFile;
+        String mergeFileID;
+        String toContents;
+        String fromContents;
+        String mergeContents;
+        for (var s: conflicts) {
+            toFile = Utils.join(COMMITS, to.get(s));
+            toContents = Utils.readContentsAsString(toFile);
+            fromFile = Utils.join(COMMITS, from.get(s));
+            fromContents = Utils.readContentsAsString(fromFile);
+            mergeContents = "<<<<<<< HEAD\n" + toContents + "=======\n" + fromContents + ">>>>>>>\n";
+            mergeFileID = Utils.sha1(s, mergeContents);
+            mergeFile = Utils.join(COMMITS, mergeFileID);
+            workingFile = Utils.join(Main.CWD, s);
+            Utils.writeContents(mergeFile, mergeContents);
+            Utils.writeContents(workingFile, mergeContents);
+            nw.put(s, mergeFileID);
+        }
+    }
+
     public void merge(String branchName) {
         // same, modified, removed, new w/ respect to split point for A then compare with B
         CommitNode splitPoint = findSplitPoint(head(), branches.get(branchName));
@@ -543,60 +582,68 @@ public class CommitTree implements Serializable {
             checkoutBranch(branchName);
             Main.exitWithError("Current branch fast-forwarded.");
         }
-        //splitPoint.references.
 
-        CommitNode mergeFrom = branches.get(branchName);
+        HashMap<String, String> toRefs = head().references;
+        HashMap<String, String> frRefs = branches.get(branchName).references;
+        HashMap<String, String> spRefs = splitPoint.references;
 
-        // Current branch ith respect to split point
-        LinkedList<String> same = new LinkedList<>();
-        LinkedList<String> modified = new LinkedList<>();
-        //LinkedList<String> missing = new LinkedList<>();
-        LinkedList<String> newest = new LinkedList<>();
+        HashSet<String> files = new HashSet<>();
+        HashSet<String> filesToDelete = new HashSet<>();
+        files.addAll(toRefs.keySet());
+        files.addAll(frRefs.keySet());
+        files.addAll(spRefs.keySet());
 
-
-        Set<String> missing = splitPoint.references.keySet();
-        for (var s: head().references.keySet()) {
-            if (splitPoint.references.containsKey(s)) {
-                missing.remove(s);
-                if (splitPoint.references.get(s).equals(head().references.get(s))) {
-                    same.push(s);
+        HashMap<String, String> nwRefs = new HashMap<>();
+        HashSet<String> mergeConflicts = new HashSet<>();
+        for (var f: files) {
+            if (checkRefs(toRefs, frRefs, f)) {
+                if (toRefs.get(f) != null) {
+                    nwRefs.put(f, toRefs.get(f));
                 }
                 else {
-                    modified.push(s);
+                    filesToDelete.add(f);
                 }
             }
             else {
-                newest.push(s);
-            }
-        }
-
-        HashMap<String, String> mergedRefs = new HashMap<>();
-        mergedRefs.putAll(mergeFrom.references);
-
-        for (var s: missing) {
-            if (mergedRefs.containsKey(s)) {
-                // merge conflict
-            }
-        }
-        for (var s: newest) {
-            if (mergedRefs.containsKey(s)) {
-                if (mergedRefs.get(s) != head().references.get(s)) {
-                    // merge conflict
+                if (checkRefs(spRefs, toRefs, f)) {
+                    if (frRefs.get(f) != null) {
+                        nwRefs.put(f, frRefs.get(f));
+                    }
+                    else {
+                        filesToDelete.add(f);
+                    }
+                }
+                else if (checkRefs(spRefs, frRefs, f)) {
+                    if (toRefs.get(f) != null) {
+                        nwRefs.put(f, toRefs.get(f));
+                    }
+                    else {
+                        filesToDelete.add(f);
+                    }
+                }
+                else {
+                    mergeConflicts.add(f);
                 }
             }
-            else {
-                mergedRefs.put(s, head().references.get(s));
-            }
         }
-        for (var s: modified) {
-            if (mergedRefs.containsKey(s)) {
+        handleMergeConflicts(mergeConflicts, toRefs, frRefs, nwRefs);
+        //File workingFile;
+        //for (var f: filesToDelete) {
+        //    workingFile = Utils.join(Main.CWD, f);
+        //    workingFile.delete();
+        //}
 
-            }
-            else {
-                // merge conflict
-            }
+        String message = "Merged " + branchName + " into " + currentBranch;
+        CommitNode mergeNode = new CommitNode(message, new Date(System.currentTimeMillis()), nwRefs);
+        mergeNode.secondParent = branches.get(branchName);
+        mergeNode.merges = branches.get(branchName).id.substring(0, 7) + " " + head().id.substring(0, 7);
+        head().addChild(mergeNode);
+        branches.replace(currentBranch, mergeNode);
+        if (mergeConflicts.size() > 0) {
+           System.out.println("Encountered a merge conflict.");
         }
-
+        resetToCommit(mergeNode);
+        save();
     }
 
 

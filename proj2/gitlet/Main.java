@@ -208,8 +208,9 @@ public class Main {
     }
 
     public static void merge(String... args){
-        validateNumArgs(args,1);
+        validateNumArgs(args,2);
         CommitTree tree = CommitTree.load();
+        tree.merge(args[1]);
     }
 
     public static void rebase(String... args) {
