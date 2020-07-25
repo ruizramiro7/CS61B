@@ -659,9 +659,11 @@ public class CommitTree implements Serializable {
         if (!staged.containsKey(fileName) && !head().references.containsKey(fileName)) {
             Main.exitWithError("No reason to remove the file.");
         }
-        File fileToRemove = Utils.join(Main.CWD, fileName);
-        fileToRemove.delete();
-        toRemove.push(fileName);
+        if (head().references.containsKey(fileName)) {
+            File fileToRemove = Utils.join(Main.CWD, fileName);
+            fileToRemove.delete();
+            toRemove.push(fileName);
+        }
         if (staged.containsKey(fileName)) {
             File stagedFile = Utils.join(STAGING_AREA, staged.get(fileName));
             stagedFile.delete();
@@ -679,6 +681,7 @@ public class CommitTree implements Serializable {
 
         File fileAsCopy;
         for (File f: files) {
+            toRemove.remove(f);
             String contents = Utils.readContentsAsString(f);
             String id = Utils.sha1(f.getName() + contents);
 
