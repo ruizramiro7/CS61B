@@ -24,9 +24,6 @@ public class Main {
         }
         switch (args[0]) {
             case "init":
-                if (checkInit()) {
-                    break;
-                }
                 initialize(args);
                 break;
             case "add":
@@ -80,6 +77,9 @@ public class Main {
 
     public static void initialize(String... args) {
         validateNumArgs(args, 1);
+        if (checkInit()) {
+            exitWithError("A Gitlet version-control system already exists in the current directory.");
+        }
 
         if (!METADATA_DIR.exists()) {
             METADATA_DIR.mkdir();

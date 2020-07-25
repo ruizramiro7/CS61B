@@ -227,12 +227,10 @@ public class CommitTree implements Serializable {
 
     public void removeBranch(String branchName) {
         if (!branches.containsKey(branchName)) {
-            throw new RuntimeException(
-                    "A branch with that name does not exist.");
+            Main.exitWithError("A branch with that name does not exist.");
         }
         else if (branchName.equals(currentBranch)) {
-            throw new RuntimeException(
-                    "Cannot remove the current branch.");
+            Main.exitWithError("Cannot remove the current branch.");
         }
         else {
             branches.remove(branchName);
@@ -282,7 +280,7 @@ public class CommitTree implements Serializable {
      */
     private void checkoutFile(String fileName, CommitNode node) {
         if (!node.references.containsKey(fileName)) {
-            throw new RuntimeException("File does not exist in that commit.");
+            Main.exitWithError("File does not exist in that commit.");
         }
         File workingFile = Utils.join(Main.CWD, fileName);
         File commitFile = Utils.join(COMMITS, node.references.get(fileName));
@@ -307,13 +305,13 @@ public class CommitTree implements Serializable {
 
     public void checkoutBranch(String branchName) {
         if (!branches.containsKey(branchName)) {
-            throw new RuntimeException("No such branch exists.");
+            Main.exitWithError("No such branch exists.");
         }
         else if (currentBranch == branchName) {
-            throw new RuntimeException("No need to checkout the current branch.");
+            Main.exitWithError("No need to checkout the current branch.");
         }
         else if (getUntracked().size() > 0) {
-            throw new RuntimeException("There is an untracked file in the way; " +
+            Main.exitWithError("There is an untracked file in the way; " +
                     "delete it, or add and commit it first.");
         }
         else {
@@ -603,6 +601,13 @@ public class CommitTree implements Serializable {
      *                gitlet log command.
      */
     public void commit(String message) {
+
+        if (staged.isEmpty() && toRemove.isEmpty()) {
+            Main.exitWithError("No changes added to the commit.");
+        }
+        else if (message.equals("")) {
+            Main.exitWithError("Please enter a commit message.");
+        }
 
         // Loop over all staged docs
         for (String filename: staged.keySet()) {
