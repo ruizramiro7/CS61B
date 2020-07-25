@@ -28,52 +28,62 @@ echo "version 1" >> ./$testdir/test.txt
 cd $testdir
 echo "java gitlet.Main init"
 java gitlet.Main init
-echo "java gitlet.Main add test.txt"
-java gitlet.Main add "test.txt"
-echo "gitlet.Main log"
-java gitlet.Main log
-echo "gitlet.Main commit 'test commit'"
-java gitlet.Main commit "test commit"
-echo "ls .gitlet/stage"
-ls .gitlet/stage
-echo "ls .gitlet/commits"
-ls .gitlet/commits
-echo "java gitlet.Main log"
-java gitlet.Main log
-echo "java gitlet.Main branch testBranch"
-java gitlet.Main branch testBranch
-echo "java gitlet.Main status"
-java gitlet.Main status
-
-#echo "======================="
-#echo "TESTING BRANCH CHECKOUT"
-#echo "======================="
+#echo "java gitlet.Main add test.txt"
+#java gitlet.Main add "test.txt"
+#echo "gitlet.Main log"
+#java gitlet.Main log
+#echo "gitlet.Main commit 'test commit'"
+#java gitlet.Main commit "test commit"
+#echo "ls .gitlet/stage"
+#ls .gitlet/stage
+#echo "ls .gitlet/commits"
+#ls .gitlet/commits
+#echo "java gitlet.Main log"
+#java gitlet.Main log
+#echo "java gitlet.Main branch testBranch"
+#java gitlet.Main branch testBranch
+#echo "java gitlet.Main status"
+#java gitlet.Main status
+#
+##echo "======================="
+##echo "TESTING BRANCH CHECKOUT"
+##echo "======================="
+##java gitlet.Main checkout testBranch
+##touch text2.txt
+##java gitlet.Main add text2.txt
+##java gitlet.Main commit "Added text2.txt"
+##echo "Before:"
+##ls
+##echo "After:"
+##java gitlet.Main checkout master
+##ls
+#
+## ======================================
+#echo "=============="
+#echo "TESTING REBASE"
+#echo "=============="
+#
+#echo "m" >> master.txt
+#java gitlet.Main add master.txt
+#java gitlet.Main commit "Added master.txt"
 #java gitlet.Main checkout testBranch
-#touch text2.txt
-#java gitlet.Main add text2.txt
-#java gitlet.Main commit "Added text2.txt"
-#echo "Before:"
-#ls
-#echo "After:"
+#echo "m" >> testBranch.txt
+#java gitlet.Main add testBranch.txt
+#java gitlet.Main commit "Added testBranch.txt"
+#java gitlet.Main log
+#java gitlet.Main rebase master
 #java gitlet.Main checkout master
-#ls
+#java gitlet.Main log
 
-# ======================================
-echo "=============="
-echo "TESTING REBASE"
-echo "=============="
-
-echo "m" >> master.txt
-java gitlet.Main add master.txt
-java gitlet.Main commit "Added master.txt"
-java gitlet.Main checkout testBranch
-echo "m" >> testBranch.txt
-java gitlet.Main add testBranch.txt
-java gitlet.Main commit "Added testBranch.txt"
-java gitlet.Main log
-java gitlet.Main rebase master
-java gitlet.Main checkout master
-java gitlet.Main log
+#touch f.txt g.txt
+#java gitlet.Main add f.txt
+#java gitlet.Main add g.txt
+#java gitlet.Main commit "added f.txt and g.txt"
+#java gitlet.Main rm f.txt
+#java gitlet.Main status
+#touch f.txt
+#java gitlet.Main add f.txt
+#java gitlet.Main status
 
 echo "DONE"
 cd ..
