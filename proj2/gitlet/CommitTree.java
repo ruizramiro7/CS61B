@@ -270,7 +270,11 @@ public class CommitTree implements Serializable {
      * @return Finds the commit with the matching ID
      */
     private CommitNode findCommit(String id) {
-        return root.findCommit(id, SEARCH_PRECISION);
+        CommitNode node = root.findCommit(id, SEARCH_PRECISION);
+        if (node == null) {
+            Main.exitWithError("No commit with that id exists.");
+        }
+        return node;
     }
 
     /**
@@ -296,9 +300,6 @@ public class CommitTree implements Serializable {
 
     public void checkoutByCommitID(String id, String fileName) {
         CommitNode node = findCommit(id);
-        if (node == null) {
-            Main.exitWithError("No commit with that id exists.");
-        }
         checkoutFile(fileName, node);
 
     }
@@ -651,10 +652,13 @@ public class CommitTree implements Serializable {
     }
 
     /**
-     * Removes the file from the directory completley.
+     * Removes the file from the directory completely.
      * @param fileName Takes in a string of the file name.
      */
     public void remove(String fileName) {
+        if (!staged.containsKey(fileName) && !head().references.containsKey(fileName)) {
+            Main.exitWithError("No reason to remove the file.");
+        }
         File fileToRemove = Utils.join(Main.CWD, fileName);
         fileToRemove.delete();
         toRemove.push(fileName);
