@@ -37,6 +37,7 @@ public class CommitTree implements Serializable {
         private String id;
         private HashMap<String, String> references;
         public CommitNode parent;
+        public CommitNode secondParent;
         public List<CommitNode> children;
 
         /**
@@ -456,9 +457,19 @@ public class CommitTree implements Serializable {
     }
 
     public void rebase(String branchName) {
+        if (!branches.containsKey(branchName)) {
+            Main.exitWithError("A branch with that name does not exist.");
+        }
+        else if (currentBranch.equals(branchName)) {
+            Main.exitWithError("Cannot rebase a branch onto itself.");
+        }
+
         LinkedList<CommitNode> history = new LinkedList<>();
         CommitNode anchorPoint = branches.get(branchName);
         CommitNode splitPoint = findSplitPoint(head(), anchorPoint);
+        if (splitPoint == anchorPoint) {
+            Main.exitWithError("Already up-to-date.");
+        }
         head().getHistory(splitPoint, history);
         CommitNode current = branches.get(branchName);
         while (history.size() > 0) {
@@ -466,6 +477,72 @@ public class CommitTree implements Serializable {
         }
         branches.replace(branchName, current);
         save();
+    }
+
+    public void merge(String branchName) {
+        // same, modified, removed, new w/ respect to split point for A then compare with B
+        CommitNode splitPoint = findSplitPoint(head(), branches.get(branchName));
+        if (splitPoint == branches.get(branchName)) {
+            Main.exitWithError("Given branch is an ancestor of the current branch.");
+        }
+        else if (splitPoint == head()) {
+            checkoutBranch(branchName);
+            Main.exitWithError("Current branch fast-forwarded.");
+        }
+        //splitPoint.references.
+
+        CommitNode mergeFrom = branches.get(branchName);
+
+        // Current branch ith respect to split point
+        LinkedList<String> same = new LinkedList<>();
+        LinkedList<String> modified = new LinkedList<>();
+        //LinkedList<String> missing = new LinkedList<>();
+        LinkedList<String> newest = new LinkedList<>();
+
+
+        Set<String> missing = splitPoint.references.keySet();
+        for (var s: head().references.keySet()) {
+            if (splitPoint.references.containsKey(s)) {
+                missing.remove(s);
+                if (splitPoint.references.get(s).equals(head().references.get(s))) {
+                    same.push(s);
+                }
+                else {
+                    modified.push(s);
+                }
+            }
+            else {
+                newest.push(s);
+            }
+        }
+
+        HashMap<String, String> mergedRefs = new HashMap<>();
+        mergedRefs.putAll(mergeFrom.references);
+
+        for (var s: missing) {
+            if (mergedRefs.containsKey(s)) {
+                // merge conflict
+            }
+        }
+        for (var s: newest) {
+            if (mergedRefs.containsKey(s)) {
+                if (mergedRefs.get(s) != head().references.get(s)) {
+                    // merge conflict
+                }
+            }
+            else {
+                mergedRefs.put(s, head().references.get(s));
+            }
+        }
+        for (var s: modified) {
+            if (mergedRefs.containsKey(s)) {
+
+            }
+            else {
+                // merge conflict
+            }
+        }
+
     }
 
 
