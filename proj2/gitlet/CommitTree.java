@@ -419,7 +419,7 @@ public class CommitTree implements Serializable {
         printStrings(staged.keySet().stream().sorted().collect(Collectors.toList()));
         System.out.println("\n=== Removed Files ===");
         printStrings(toRemove.stream().sorted().collect(Collectors.toList()));
-        System.out.println("\n=== Modifications Not Staged for Commit ===");
+        System.out.println("\n=== Modifications Not Staged For Commit ===");
         printStrings(getModified().stream().sorted().collect(Collectors.toList()));
         System.out.println("\n=== Untracked Files ===");
         printStrings(getUntracked().stream().sorted().collect(Collectors.toList()));
