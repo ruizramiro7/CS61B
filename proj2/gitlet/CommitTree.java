@@ -615,6 +615,7 @@ public class CommitTree implements Serializable {
         HashMap<String, String> nwRefs = new HashMap<>();
         HashSet<String> mergeConflicts = new HashSet<>();
         for (var f: files) {
+            // Cases when to and from have same file
             if (checkRefs(toRefs, frRefs, f)) {
                 if (toRefs.get(f) != null) {
                     nwRefs.put(f, toRefs.get(f));
@@ -641,7 +642,15 @@ public class CommitTree implements Serializable {
                     }
                 }
                 else {
-                    mergeConflicts.add(f);
+                    if (frRefs.get(f) == null) {
+                       nwRefs.put(f, toRefs.get(f));
+                    }
+                    else if (toRefs.get(f) == null) {
+                        nwRefs.put(f, frRefs.get(f));
+                    }
+                    else {
+                        mergeConflicts.add(f);
+                    }
                 }
             }
         }
