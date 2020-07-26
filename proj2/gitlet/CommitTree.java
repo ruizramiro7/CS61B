@@ -642,15 +642,16 @@ public class CommitTree implements Serializable {
                     }
                 }
                 else {
-                    if (frRefs.get(f) == null) {
-                       nwRefs.put(f, toRefs.get(f));
-                    }
-                    else if (toRefs.get(f) == null) {
-                        nwRefs.put(f, frRefs.get(f));
-                    }
-                    else {
-                        mergeConflicts.add(f);
-                    }
+                    //if (frRefs.get(f) == null) {
+                    //   nwRefs.put(f, toRefs.get(f));
+                    //}
+                    //else if (toRefs.get(f) == null) {
+                    //    nwRefs.put(f, frRefs.get(f));
+                    //}
+                    //else {
+                    //    mergeConflicts.add(f);
+                    //}
+                    mergeConflicts.add(f);
                 }
             }
         }
