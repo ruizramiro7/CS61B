@@ -268,6 +268,9 @@ public class CommitTree implements Serializable {
      * @param id String of a commit's id
      */
     public void reset(String id) {
+        if (getUntracked().size() > 0) {
+            Main.exitWithError("There is an untracked file in the way; delete it, or add and commit it first.");
+        }
        resetToCommit(findCommit(id));
        save();
     }
@@ -555,13 +558,17 @@ public class CommitTree implements Serializable {
         File workingFile;
         String mergeFileID;
         String toContents;
-        String fromContents;
-        String mergeContents;
+        String fromContents = "";
+        String mergeContents = "";
         for (var s: conflicts) {
-            toFile = Utils.join(COMMITS, to.get(s));
-            toContents = Utils.readContentsAsString(toFile);
-            fromFile = Utils.join(COMMITS, from.get(s));
-            fromContents = Utils.readContentsAsString(fromFile);
+            if (to.get(s) != null) {
+                toFile = Utils.join(COMMITS, to.get(s));
+                toContents = Utils.readContentsAsString(toFile);
+            }
+            if (from.get(s) != null) {
+                fromFile = Utils.join(COMMITS, from.get(s));
+                fromContents = Utils.readContentsAsString(fromFile);
+            }
             mergeContents = "<<<<<<< HEAD\n" + toContents + "=======\n" + fromContents + ">>>>>>>\n";
             mergeFileID = Utils.sha1(s, mergeContents);
             mergeFile = Utils.join(COMMITS, mergeFileID);
@@ -575,12 +582,24 @@ public class CommitTree implements Serializable {
     public void merge(String branchName) {
         // same, modified, removed, new w/ respect to split point for A then compare with B
         CommitNode splitPoint = findSplitPoint(head(), branches.get(branchName));
-        if (splitPoint == branches.get(branchName)) {
+        if (getUntracked().size() > 0) {
+            Main.exitWithError("There is an untracked file in the way; delete it, or add and commit it first.");
+        }
+        else if (!branches.containsKey(currentBranch)) {
+            Main.exitWithError("A branch with that name does not exist.");
+        }
+        else if (currentBranch.equals(branchName)) {
+            Main.exitWithError("Cannot merge a branch with itself.");
+        }
+        else if (splitPoint == branches.get(branchName)) {
             Main.exitWithError("Given branch is an ancestor of the current branch.");
         }
         else if (splitPoint == head()) {
             checkoutBranch(branchName);
             Main.exitWithError("Current branch fast-forwarded.");
+        }
+        else if (staged.size() > 0 || toRemove.size() > 0) {
+            Main.exitWithError("You have uncommitted changes.");
         }
 
         HashMap<String, String> toRefs = head().references;
@@ -636,7 +655,7 @@ public class CommitTree implements Serializable {
         String message = "Merged " + branchName + " into " + currentBranch;
         CommitNode mergeNode = new CommitNode(message, new Date(System.currentTimeMillis()), nwRefs);
         mergeNode.secondParent = branches.get(branchName);
-        mergeNode.merges = branches.get(branchName).id.substring(0, 7) + " " + head().id.substring(0, 7);
+        mergeNode.merges = head().id.substring(0, 7) + " " + branches.get(branchName).id.substring(0, 7);
         head().addChild(mergeNode);
         branches.replace(currentBranch, mergeNode);
         if (mergeConflicts.size() > 0) {

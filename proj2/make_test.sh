@@ -46,7 +46,8 @@ java gitlet.Main commit "Master pointer"
 java gitlet.Main checkout other
 touch other.txt
 java gitlet.Main add other.txt
-echo "Edit from other" >> mod.txt
+#echo "Edit from other" >> mod.txt
+echo "" > mod.txt
 java gitlet.Main rm rem.txt
 java gitlet.Main add mod.txt
 java gitlet.Main commit "Removed rem.txt and modified mod.txt"
