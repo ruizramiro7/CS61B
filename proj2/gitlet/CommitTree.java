@@ -498,9 +498,7 @@ public class CommitTree implements Serializable {
      * @param B
      * @return
      */
-    public CommitNode findSplitPoint(CommitNode A, CommitNode B) {
-
-        int distance = 0;
+    public CommitNode findSplitPoint(CommitNode A, CommitNode B, int distance) {
 
        while (A != null && B != null) {
            int dateDiff = A.timestamp.compareTo(B.timestamp);
@@ -511,8 +509,8 @@ public class CommitTree implements Serializable {
 
            if (dateDiff < 0) {
                if (B.secondParent != null) {
-                   CommitNode pathA = findSplitPoint(A, B.parent);
-                   CommitNode pathB = findSplitPoint(A, B.secondParent);
+                   CommitNode pathA = findSplitPoint(A, B.parent, distance);
+                   CommitNode pathB = findSplitPoint(A, B.secondParent, distance);
                    if (pathA == null && pathB == null) {
                        return null;
                    }
@@ -533,8 +531,8 @@ public class CommitTree implements Serializable {
            }
            else {
                if (A.secondParent != null) {
-                   CommitNode pathA = findSplitPoint(A.parent, B);
-                   CommitNode pathB = findSplitPoint(A.secondParent, B);
+                   CommitNode pathA = findSplitPoint(A.parent, B, distance + 1);
+                   CommitNode pathB = findSplitPoint(A.secondParent, B, distance + 1);
                    if (pathA == null && pathB == null) {
                        return null;
                    }
@@ -574,7 +572,7 @@ public class CommitTree implements Serializable {
 
         LinkedList<CommitNode> history = new LinkedList<>();
         CommitNode anchorPoint = branches.get(branchName);
-        CommitNode splitPoint = findSplitPoint(head(), anchorPoint);
+        CommitNode splitPoint = findSplitPoint(head(), anchorPoint, 0);
         if (splitPoint == anchorPoint) {
             Main.exitWithError("Already up-to-date.");
         }
@@ -626,7 +624,7 @@ public class CommitTree implements Serializable {
 
     public void merge(String branchName) {
         // same, modified, removed, new w/ respect to split point for A then compare with B
-        CommitNode splitPoint = findSplitPoint(head(), branches.get(branchName));
+        CommitNode splitPoint = findSplitPoint(head(), branches.get(branchName), 0);
         if (getUntracked().size() > 0) {
             Main.exitWithError("There is an untracked file in the way; delete it, or add and commit it first.");
         }
