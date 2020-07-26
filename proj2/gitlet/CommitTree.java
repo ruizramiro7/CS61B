@@ -406,6 +406,7 @@ public class CommitTree implements Serializable {
     public void printCommitsWithMessage(String message)  {
         LinkedList<String> commitIds = new LinkedList<>();
         root.findCommitsWithMessage(message, commitIds);
+
         if (commitIds.size() == 0) {
             Main.exitWithError("Found no commit with that message.");
         }
