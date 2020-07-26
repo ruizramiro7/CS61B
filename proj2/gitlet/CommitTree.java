@@ -37,6 +37,7 @@ public class CommitTree implements Serializable {
         private Date timestamp;
         private String id;
         private HashMap<String, String> references;
+        private int distance = 0;
         public CommitNode parent;
         public CommitNode secondParent;
         public List<CommitNode> children;
@@ -115,6 +116,7 @@ public class CommitTree implements Serializable {
 
         public void addChild(CommitNode node) {
             node.parent = this;
+            node.distance = this.distance + 1;
             children.add(node);
         }
 
@@ -504,9 +506,47 @@ public class CommitTree implements Serializable {
            }
 
            if (dateDiff < 0) {
+               if (B.secondParent != null) {
+                   CommitNode pathA = findSplitPoint(A, B.parent);
+                   CommitNode pathB = findSplitPoint(A, B.secondParent);
+                   if (pathA == null && pathB == null) {
+                       return null;
+                   }
+                   else if (pathA == null) {
+                       return pathB;
+                   }
+                   else if (pathB == null) {
+                       return pathA;
+                   }
+                   else {
+                       if (pathA.distance < pathB.distance) {
+                           return pathA;
+                       }
+                       return pathB;
+                   }
+               }
                B = B.parent;
            }
            else {
+               if (A.secondParent != null) {
+                   CommitNode pathA = findSplitPoint(A, A.parent);
+                   CommitNode pathB = findSplitPoint(A, A.secondParent);
+                   if (pathA == null && pathB == null) {
+                       return null;
+                   }
+                   else if (pathA == null) {
+                       return pathB;
+                   }
+                   else if (pathB == null) {
+                       return pathA;
+                   }
+                   else {
+                       if (pathA.distance < pathB.distance) {
+                           return pathA;
+                       }
+                       return pathB;
+                   }
+               }
                A = A.parent;
            }
 
