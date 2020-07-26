@@ -725,7 +725,9 @@ public class CommitTree implements Serializable {
         files.addAll(B.references.keySet());
         for (var f: files) {
             if (A.references.get(f) == null || B.references.get(f) == null) {
-                return A.references.get(f) != B.references.get(f);
+                if (A.references.get(f) != B.references.get(f)) {
+                    return false;
+                }
             }
 
             if (A.references.get(f).equals(B.references.get(f))) {
