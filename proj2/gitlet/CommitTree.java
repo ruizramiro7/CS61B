@@ -625,6 +625,9 @@ public class CommitTree implements Serializable {
         if (getUntracked().size() > 0) {
             Main.exitWithError("There is an untracked file in the way; delete it, or add and commit it first.");
         }
+        else if (staged.size() > 0 || toRemove.size() > 0) {
+            Main.exitWithError("You have uncommitted changes.");
+        }
         else if (!branches.containsKey(currentBranch)) {
             Main.exitWithError("A branch with that name does not exist.");
         }
@@ -637,9 +640,6 @@ public class CommitTree implements Serializable {
         }
         else if (splitPoint == branches.get(branchName)) {
             Main.exitWithError("Given branch is an ancestor of the current branch.");
-        }
-        else if (staged.size() > 0 || toRemove.size() > 0) {
-            Main.exitWithError("You have uncommitted changes.");
         }
 
         HashMap<String, String> toRefs = head().references;
@@ -682,15 +682,6 @@ public class CommitTree implements Serializable {
                     }
                 }
                 else {
-                    //if (frRefs.get(f) == null) {
-                    //   nwRefs.put(f, toRefs.get(f));
-                    //}
-                    //else if (toRefs.get(f) == null) {
-                    //    nwRefs.put(f, frRefs.get(f));
-                    //}
-                    //else {
-                    //    mergeConflicts.add(f);
-                    //}
                     mergeConflicts.add(f);
                 }
             }
