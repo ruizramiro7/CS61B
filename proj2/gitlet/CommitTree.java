@@ -763,6 +763,7 @@ public class CommitTree implements Serializable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
             Utils.writeContents(newFile, contents);
             //!// Delete staged file after copying
             oldFile.delete();
