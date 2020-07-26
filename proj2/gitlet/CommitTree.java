@@ -706,6 +706,9 @@ public class CommitTree implements Serializable {
         CommitNode mergeNode = new CommitNode(message, new Date(System.currentTimeMillis()), nwRefs);
         mergeNode.secondParent = branches.get(branchName);
         mergeNode.merges = head().id.substring(0, 7) + " " + branches.get(branchName).id.substring(0, 7);
+        if (sameCommit(mergeNode, head())) {
+            Main.exitWithError("No changes added to the commit.");
+        }
         head().addChild(mergeNode);
         branches.replace(currentBranch, mergeNode);
         if (mergeConflicts.size() > 0) {
@@ -713,6 +716,18 @@ public class CommitTree implements Serializable {
         }
         resetToCommit(mergeNode);
         save();
+    }
+
+    private boolean sameCommit(CommitNode A, CommitNode B) {
+        HashSet<String> files = new HashSet<>();
+        files.addAll(A.references.keySet());
+        files.addAll(B.references.keySet());
+        for (var f: files) {
+            if (A.references.get(f) != B.references.get(f)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 
