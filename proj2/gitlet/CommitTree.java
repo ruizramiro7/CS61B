@@ -519,7 +519,7 @@ public class CommitTree implements Serializable {
                        return pathA;
                    }
                    else {
-                       if (pathA.distance < pathB.distance) {
+                       if (pathA.distance > pathB.distance) {
                            return pathA;
                        }
                        return pathB;
@@ -529,8 +529,8 @@ public class CommitTree implements Serializable {
            }
            else {
                if (A.secondParent != null) {
-                   CommitNode pathA = findSplitPoint(A, A.parent);
-                   CommitNode pathB = findSplitPoint(A, A.secondParent);
+                   CommitNode pathA = findSplitPoint(A.parent, B);
+                   CommitNode pathB = findSplitPoint(A.secondParent, B);
                    if (pathA == null && pathB == null) {
                        return null;
                    }
@@ -541,7 +541,7 @@ public class CommitTree implements Serializable {
                        return pathA;
                    }
                    else {
-                       if (pathA.distance < pathB.distance) {
+                       if (pathA.distance > pathB.distance) {
                            return pathA;
                        }
                        return pathB;
