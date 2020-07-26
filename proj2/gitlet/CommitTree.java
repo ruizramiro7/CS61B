@@ -557,7 +557,7 @@ public class CommitTree implements Serializable {
         File mergeFile;
         File workingFile;
         String mergeFileID;
-        String toContents;
+        String toContents = "";
         String fromContents = "";
         String mergeContents = "";
         for (var s: conflicts) {
