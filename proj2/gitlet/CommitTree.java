@@ -709,6 +709,7 @@ public class CommitTree implements Serializable {
         if (sameCommit(mergeNode, head())) {
             Main.exitWithError("No changes added to the commit.");
         }
+
         head().addChild(mergeNode);
         branches.replace(currentBranch, mergeNode);
         if (mergeConflicts.size() > 0) {
