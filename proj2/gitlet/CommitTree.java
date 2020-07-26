@@ -631,12 +631,12 @@ public class CommitTree implements Serializable {
         else if (currentBranch.equals(branchName)) {
             Main.exitWithError("Cannot merge a branch with itself.");
         }
-        else if (splitPoint == branches.get(branchName)) {
-            Main.exitWithError("Given branch is an ancestor of the current branch.");
-        }
         else if (splitPoint == head()) {
             checkoutBranch(branchName);
             Main.exitWithError("Current branch fast-forwarded.");
+        }
+        else if (splitPoint == branches.get(branchName)) {
+            Main.exitWithError("Given branch is an ancestor of the current branch.");
         }
         else if (staged.size() > 0 || toRemove.size() > 0) {
             Main.exitWithError("You have uncommitted changes.");
@@ -725,7 +725,7 @@ public class CommitTree implements Serializable {
         files.addAll(B.references.keySet());
         for (var f: files) {
             if (A.references.get(f) == null || B.references.get(f) == null) {
-                return A.references.get(f) == B.references.get(f);
+                return A.references.get(f) != B.references.get(f);
             }
 
             if (A.references.get(f).equals(B.references.get(f))) {
