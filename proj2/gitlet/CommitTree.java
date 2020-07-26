@@ -702,7 +702,7 @@ public class CommitTree implements Serializable {
         //    workingFile.delete();
         //}
 
-        String message = "Merged " + branchName + " into " + currentBranch;
+        String message = "Merged " + branchName + " into " + currentBranch + ".";
         CommitNode mergeNode = new CommitNode(message, new Date(System.currentTimeMillis()), nwRefs);
         mergeNode.secondParent = branches.get(branchName);
         mergeNode.merges = head().id.substring(0, 7) + " " + branches.get(branchName).id.substring(0, 7);
