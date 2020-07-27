@@ -644,7 +644,7 @@ public class CommitTree implements Serializable {
         else if (splitPoint == branches.get(branchName)) {
             Main.exitWithError("Given branch is an ancestor of the current branch.");
         }
-
+        r
         HashMap<String, String> toRefs = head().references;
         HashMap<String, String> frRefs = branches.get(branchName).references;
         HashMap<String, String> spRefs = splitPoint.references;
@@ -690,19 +690,11 @@ public class CommitTree implements Serializable {
             }
         }
         handleMergeConflicts(mergeConflicts, toRefs, frRefs, nwRefs);
-        //File workingFile;
-        //for (var f: filesToDelete) {
-        //    workingFile = Utils.join(Main.CWD, f);
-        //    workingFile.delete();
-        //}
 
         String message = "Merged " + branchName + " into " + currentBranch + ".";
         CommitNode mergeNode = new CommitNode(message, new Date(System.currentTimeMillis()), nwRefs);
         mergeNode.secondParent = branches.get(branchName);
         mergeNode.merges = head().id.substring(0, 7) + " " + branches.get(branchName).id.substring(0, 7);
-        //if (sameCommit(mergeNode, head())) {
-        //    Main.exitWithError("No changes added to the commit.");
-        //}
 
         head().addChild(mergeNode);
         branches.replace(currentBranch, mergeNode);
@@ -712,25 +704,6 @@ public class CommitTree implements Serializable {
         resetToCommit(mergeNode);
         save();
     }
-
-    private boolean sameCommit(CommitNode A, CommitNode B) {
-        HashSet<String> files = new HashSet<>();
-        files.addAll(A.references.keySet());
-        files.addAll(B.references.keySet());
-        for (var f: files) {
-            if (A.references.get(f) == null || B.references.get(f) == null) {
-                if (A.references.get(f) != B.references.get(f)) {
-                    return false;
-                }
-            }
-
-            if (A.references.get(f).equals(B.references.get(f))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
 
     /**
      * Creates a new commit node by overwriting parent commit with new changes.
