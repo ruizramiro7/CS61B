@@ -1,9 +1,10 @@
+import java.util.Iterator;
 import java.util.LinkedList;
 
-public class SimpleNameMap {
+public class HashMap<K, V> implements Map61BL<K, V> {
 
     public static void main(String... args) {
-        SimpleNameMap m = new SimpleNameMap();
+        HashMap m = new HashMap();
         m.put("A", "TestA");
         System.out.println(m.get("A") == "TestA");
         System.out.println(m.get("B") == null);
@@ -31,12 +32,32 @@ public class SimpleNameMap {
         System.out.println(m.size == 8);
     }
 
-    LinkedList<Entry>[] map;
+    LinkedList<Entry<K, V>>[] map;
     int size;
-    int capacity = 10;
-    static final double LOAD_FACTOR = 7.0 / 10.0;
+    int capacity = 16;
+    double loadFactor = 7.0 / 10.0;
 
-    public SimpleNameMap() {
+    public HashMap() {
+        this.map = buildMap(capacity);
+        size = 0;
+        init();
+    }
+
+    public HashMap(int initialCapacity) {
+        this.capacity = initialCapacity;
+        this.map = buildMap(capacity);
+        size = 0;
+        init();
+
+    }
+
+    public HashMap(int initialCapacity, double loadFactor) {
+        this.capacity = initialCapacity;
+        this.loadFactor = loadFactor;
+        init();
+    }
+
+    private void init() {
         this.map = buildMap(capacity);
         size = 0;
     }
@@ -46,14 +67,16 @@ public class SimpleNameMap {
         return size;
     }
 
+    public int capacity() { return capacity; }
+
     /* Returns true if the map contains the KEY. */
-    public boolean containsKey(String key) {
+    public boolean containsKey(K key) {
         return get(key) != null;
     }
 
     /* Returns the value for the specified KEY. If KEY is not found, return
        null. */
-    public String get(String key) {
+    public V get(K key) {
         for (var e: map[hash(key)]) {
             if (e.key.equals(key)) {
                 return e.value;
@@ -62,8 +85,8 @@ public class SimpleNameMap {
         return null;
     }
 
-    private static LinkedList<Entry>[] buildMap(int capacity) {
-        LinkedList<Entry>[] newMap = new LinkedList[capacity];
+    private LinkedList<Entry<K, V>>[] buildMap(int capacity) {
+        LinkedList<Entry<K, V>>[] newMap = new LinkedList[capacity];
         for (int i = 0; i < newMap.length; ++i) {
             newMap[i] = new LinkedList<>();
         }
@@ -73,7 +96,7 @@ public class SimpleNameMap {
     private void resize() {
         capacity *= 2;
         size = 0;
-        LinkedList<Entry>[] oldMap = map;
+        LinkedList<Entry<K, V>>[] oldMap = map;
         map = buildMap(capacity);
         for (int i = 0; i < oldMap.length; ++i) {
             for (var e: oldMap[i]) {
@@ -84,7 +107,7 @@ public class SimpleNameMap {
 
     /* Puts a (KEY, VALUE) pair into this map. If the KEY already exists in the
        SimpleNameMap, replace the current corresponding value with VALUE. */
-    public void put(String key, String value) {
+    public void put(K key, V value) {
         int index = hash(key);
         for (var e: map[index]) {
             if (e.key.equals(key)) {
@@ -92,7 +115,7 @@ public class SimpleNameMap {
                 return;
             }
         }
-        if ((double)(size + 1)/ (double)capacity > LOAD_FACTOR) {
+        if ((double)(size + 1)/ (double)capacity > loadFactor) {
             resize();
         }
         map[hash(key)].add(new Entry(key, value));
@@ -101,13 +124,13 @@ public class SimpleNameMap {
 
     /* Removes a single entry, KEY, from this table and return the VALUE if
        successful or NULL otherwise. */
-    public String remove(String key) {
+    public V remove(K key) {
         int index = hash(key);
-        Entry entry;
+        Entry<K, V> entry;
         for (int i = 0; i < map[index].size(); ++i) {
             entry = map[index].get(i);
             if (entry.key.equals(key)) {
-                String value = entry.value;
+                V value = entry.value;
                 map[index].remove(i);
                 size -= 1;
                 return value;
@@ -116,17 +139,32 @@ public class SimpleNameMap {
         return null;
     }
 
+    public void clear() {
+        for (var ll: map) {
+           ll.clear();
+        }
+        size = 0;
+    }
+
+    public boolean remove(K key, V value) {
+        return false;
+    }
+
+    public Iterator<K> iterator() {
+        throw new UnsupportedOperationException();
+    }
+
     /* Converts alphabetical character to an integer in [0, 25] */
-    private int hash(String key) {
+    private int hash(K key) {
         return Math.floorMod(key.hashCode(), map.length);
     }
 
-    private static class Entry {
+    private static class Entry<K, V> {
 
-        private String key;
-        private String value;
+        private K key;
+        private V value;
 
-        Entry(String key, String value) {
+        Entry(K key, V value) {
             this.key = key;
             this.value = value;
         }
