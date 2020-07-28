@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 /* A MinHeap class of Comparable elements backed by an ArrayList. */
 public class MinHeap<E extends Comparable<E>> {
@@ -70,61 +71,83 @@ public class MinHeap<E extends Comparable<E>> {
 
     /* Returns the index of the left child of the element at index INDEX. */
     private int getLeftOf(int index) {
-        // TODO: YOUR CODE HERE
-        return -1;
+        return 2 * index;
     }
 
     /* Returns the index of the right child of the element at index INDEX. */
     private int getRightOf(int index) {
-        // TODO: YOUR CODE HERE
-        return -1;
+        return 2 * index + 1;
     }
 
     /* Returns the index of the parent of the element at index INDEX. */
     private int getParentOf(int index) {
-        // TODO: YOUR CODE HERE
-        return -1;
+        return index / 2;
     }
 
     /* Returns the index of the smaller element. At least one index has a
        non-null element. If the elements are equal, return either index. */
     private int min(int index1, int index2) {
-        // TODO: YOUR CODE HERE
-        return -1;
+        E element1 = getElement(index1);
+        E element2 = getElement(index2);
+        if (element1 == null || element2 == null) {
+            return element1 == null ? index2 : index1;
+        }
+        else if (element1.compareTo(element2) <= 0) {
+            return index1;
+        }
+        return index2;
     }
 
     /* Returns but does not remove the smallest element in the MinHeap. */
     public E findMin() {
-        // TODO: YOUR CODE HERE
-        return null;
+        return getElement(1);
     }
 
     /* Bubbles up the element currently at index INDEX. */
     private void bubbleUp(int index) {
-        // TODO: YOUR CODE HERE
+        int parentIndex = getParentOf(index);
+        if (parentIndex == 0 || min(index, parentIndex) == parentIndex) {
+            return;
+        }
+        swap(index, parentIndex);
+        bubbleUp(parentIndex);
     }
 
     /* Bubbles down the element currently at index INDEX. */
     private void bubbleDown(int index) {
-        // TODO: YOUR CODE HERE
+        if (getElement(getLeftOf(index)) == null) {
+            return;
+        }
+        int minChild = min(getLeftOf(index), getRightOf(index));
+        if (min(minChild, index) == index) {
+            return;
+        }
+        swap(index, minChild);
+        bubbleDown(minChild);
     }
 
     /* Returns the number of elements in the MinHeap. */
     public int size() {
-        // TODO: YOUR CODE HERE
-        return 0;
+        return contents.size() - 1;
     }
 
     /* Inserts ELEMENT into the MinHeap. If ELEMENT is already in the MinHeap,
        throw an IllegalArgumentException.*/
     public void insert(E element) {
-        // TODO: YOUR CODE HERE
+        if (contains(element)) {
+            throw new IllegalArgumentException();
+        }
+        contents.add(element);
+        bubbleUp(size());
     }
 
     /* Returns and removes the smallest element in the MinHeap. */
     public E removeMin() {
-        // TODO: YOUR CODE HERE
-        return null;
+        E smallest = getElement(1);
+        swap(1, size());
+        contents.remove(size());
+        bubbleDown(1);
+        return smallest;
     }
 
     /* Replaces and updates the position of ELEMENT inside the MinHeap, which
@@ -132,13 +155,20 @@ public class MinHeap<E extends Comparable<E>> {
        not exist in the MinHeap, throw a NoSuchElementException. Item equality
        should be checked using .equals(), not ==. */
     public void update(E element) {
-        // TODO: YOUR CODE HERE
+        for (int i = 1; i < contents.size(); ++i) {
+            if (getElement(i).equals(element)) {
+                bubbleUp(i);
+                bubbleDown(i);
+                return;
+            }
+        }
+        throw new NoSuchElementException();
+
     }
 
     /* Returns true if ELEMENT is contained in the MinHeap. Item equality should
        be checked using .equals(), not ==. */
     public boolean contains(E element) {
-        // TODO: YOUR CODE HERE
-        return false;
+        return contents.contains(element);
     }
 }
