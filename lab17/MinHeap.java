@@ -157,6 +157,7 @@ public class MinHeap<E extends Comparable<E>> {
     public void update(E element) {
         for (int i = 1; i < contents.size(); ++i) {
             if (getElement(i).equals(element)) {
+                setElement(i, element);
                 bubbleUp(i);
                 bubbleDown(i);
                 return;
