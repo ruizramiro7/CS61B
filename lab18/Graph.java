@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.Stack;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 public class Graph implements Iterable<Integer> {
 
@@ -33,33 +34,40 @@ public class Graph implements Iterable<Integer> {
        Edge already exists, replaces the current Edge with a new Edge with
        weight WEIGHT. */
     public void addEdge(int v1, int v2, int weight) {
-        // TODO: YOUR CODE HERE
+        adjLists[v1].add(new Edge(v1, v2, weight));
     }
 
     /* Adds an undirected Edge (V1, V2) to the graph with weight WEIGHT. If the
        Edge already exists, replaces the current Edge with a new Edge with
        weight WEIGHT. */
     public void addUndirectedEdge(int v1, int v2, int weight) {
-        // TODO: YOUR CODE HERE
+        adjLists[v1].add(new Edge(v1, v2, weight));
+        adjLists[v2].add(new Edge(v2, v1, weight));
     }
 
     /* Returns true if there exists an Edge from vertex FROM to vertex TO.
        Returns false otherwise. */
     public boolean isAdjacent(int from, int to) {
-        // TODO: YOUR CODE HERE
+        for (var edge: adjLists[from]) {
+            if (edge.to == to) {
+                return true;
+            }
+        }
         return false;
     }
 
     /* Returns a list of all the vertices u such that the Edge (V, u)
        exists in the graph. */
     public List<Integer> neighbors(int v) {
-        // TODO: YOUR CODE HERE
-        return null;
+        return adjLists[v].stream().map(e -> e.to).collect(Collectors.toList());
     }
     /* Returns the number of incoming Edges for vertex V. */
     public int inDegree(int v) {
-        // TODO: YOUR CODE HERE
-        return 0;
+        int total = 0;
+        for (var ll: adjLists) {
+            total += ll.stream().filter(e -> e.to == v).count();
+        }
+        return total;
     }
 
     /* Returns an Iterator that outputs the vertices of the graph in topological
@@ -135,19 +143,41 @@ public class Graph implements Iterable<Integer> {
         return result;
     }
 
+    private boolean pathExistsHelper(int start, int stop, HashSet<Integer> visited) {
+        if (start == stop) {
+            return true;
+        }
+        else if (visited.contains(start)) {
+            return false;
+        }
+        visited.add(start);
+        HashSet<Integer> newVisited = (HashSet) visited.clone();
+        for (var i: neighbors(start)) {
+            if (pathExistsHelper(i, stop, newVisited)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /* Returns true iff there exists a path from START to STOP. Assumes both
        START and STOP are in this graph. If START == STOP, returns true. */
     public boolean pathExists(int start, int stop) {
-        // TODO: YOUR CODE HERE
-        return false;
+        return pathExistsHelper(start, stop, new HashSet<>());
     }
 
 
     /* Returns the path from START to STOP. If no path exists, returns an empty
        List. If START == STOP, returns a List with START. */
     public List<Integer> path(int start, int stop) {
-        // TODO: YOUR CODE HERE
-        return null;
+        ArrayList<Integer> p = new ArrayList<>();
+        for (int i: dfs(start)) {
+            p.add(i);
+            if (i == stop) {
+                return p;
+            }
+        }
+        return new ArrayList<>();
     }
 
     public List<Integer> topologicalSort() {
