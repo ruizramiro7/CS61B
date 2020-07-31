@@ -151,9 +151,8 @@ public class Graph implements Iterable<Integer> {
             return false;
         }
         visited.add(start);
-        HashSet<Integer> newVisited = (HashSet) visited.clone();
         for (var i: neighbors(start)) {
-            if (pathExistsHelper(i, stop, newVisited)) {
+            if (pathExistsHelper(i, stop, (HashSet) visited.clone())) {
                 return true;
             }
         }
@@ -191,22 +190,36 @@ public class Graph implements Iterable<Integer> {
 
     private class TopologicalIterator implements Iterator<Integer> {
 
+        Integer[] currentInDegree;
+
         private Stack<Integer> fringe;
 
-        // TODO: Instance variables here!
-
         TopologicalIterator() {
-            fringe = new Stack<Integer>();
-            // TODO: YOUR CODE HERE
+            fringe = new Stack<>();
+            currentInDegree = new Integer[vertexCount];
+            for (int i = 0; i < vertexCount; ++i) {
+                currentInDegree[i] = inDegree(i);
+                if (currentInDegree[i] == 0) {
+                    fringe.push(i);
+                }
+            }
         }
 
         public boolean hasNext() {
-            // TODO: YOUR CODE HERE
-            return false;
+            return (!fringe.isEmpty());
         }
 
         public Integer next() {
-            // TODO: YOUR CODE HERE
+            if (hasNext()) {
+                int n = fringe.pop();
+                for (var e: adjLists[n]) {
+                    currentInDegree[e.to] -= 1;
+                    if (currentInDegree[e.to] == 0) {
+                        fringe.add(e.to);
+                    }
+                }
+                return n;
+            }
             return 0;
         }
 
