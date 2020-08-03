@@ -1,38 +1,48 @@
+import java.util.Arrays;
+
 public class UnionFind {
 
-    /* TODO: Add instance variables here. */
+    int[] items;
 
     /* Creates a UnionFind data structure holding N vertices. Initially, all
        vertices are in disjoint sets. */
     public UnionFind(int N) {
-        // TODO: YOUR CODE HERE
+        items = new int[N];
+        Arrays.fill(items, -1);
     }
 
     /* Returns the size of the set V belongs to. */
     public int sizeOf(int v) {
-        // TODO: YOUR CODE HERE
-        return -1;
+        if (parent(v) < 0) {
+            return parent(v);
+        }
+        return sizeOf(parent(v));
     }
 
     /* Returns the parent of V. If V is the root of a tree, returns the
        negative size of the tree for which V is the root. */
     public int parent(int v) {
-        // TODO: YOUR CODE HERE
-        return -1;
+        return items[v];
     }
 
     /* Returns true if nodes V1 and V2 are connected. */
     public boolean connected(int v1, int v2) {
-        // TODO: YOUR CODE HERE
-        return false;
+        return find(v1) == find(v2);
     }
 
     /* Returns the root of the set V belongs to. Path-compression is employed
        allowing for fast search-time. If invalid vertices are passed into this
        function, throw an IllegalArgumentException. */
     public int find(int v) {
-        // TODO: YOUR CODE HERE
-        return -1;
+        if (v > items.length - 1) {
+            throw new IllegalArgumentException();
+        }
+        int curr = v;
+        while (parent(curr) > 0) {
+            curr = parent(curr);
+        }
+        items[v] = curr;
+        return curr;
     }
 
     /* Connects two elements V1 and V2 together. V1 and V2 can be any element,
@@ -41,6 +51,18 @@ public class UnionFind {
        with itself or vertices that are already connected should not change the
        structure. */
     public void union(int v1, int v2) {
-        // TODO: YOUR CODE HERE
+        int r1 = find(v1);
+        int r2 = find(v2);
+        if (r1 == r2) {
+            return;
+        }
+        else if (sizeOf(r1) <= sizeOf(r2)) {
+            items[r2] += items[r1];
+            items[r1] = r2;
+        }
+        else {
+            items[r1] += items[r2];
+            items[r2] = r1;
+        }
     }
 }
