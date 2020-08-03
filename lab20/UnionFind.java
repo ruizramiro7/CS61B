@@ -2,7 +2,7 @@ import java.util.Arrays;
 
 public class UnionFind {
 
-    int[] items;
+    public int[] items;
 
     /* Creates a UnionFind data structure holding N vertices. Initially, all
        vertices are in disjoint sets. */
@@ -14,7 +14,7 @@ public class UnionFind {
     /* Returns the size of the set V belongs to. */
     public int sizeOf(int v) {
         if (parent(v) < 0) {
-            return parent(v);
+            return -1 * parent(v);
         }
         return sizeOf(parent(v));
     }
@@ -37,7 +37,10 @@ public class UnionFind {
         if (v > items.length - 1) {
             throw new IllegalArgumentException();
         }
-        int curr = v;
+        else if (parent(v) < 0) {
+            return v;
+        }
+        int curr = parent(v);
         while (parent(curr) > 0) {
             curr = parent(curr);
         }
