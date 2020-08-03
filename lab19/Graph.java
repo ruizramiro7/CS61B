@@ -296,7 +296,7 @@ public class Graph implements Iterable<Integer> {
                 }
             }
         }
-        ArrayList<Integer> shortest = new ArrayList<>();
+        ArrayList<Integer> shortest = new ArrayList<>(); 
         shortest.add(stop);
         int end = prev.get(stop);
         while (end != start) {
