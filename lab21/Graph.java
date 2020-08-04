@@ -1,15 +1,9 @@
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.HashSet;
-import java.util.HashMap;
+import java.util.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.io.BufferedReader;
 import java.nio.charset.Charset;
 import java.io.IOException;
-import java.util.Random;
-import java.util.Queue;
-import java.util.ArrayDeque;
 
 /* A mutable and finite Graph object. Edge labels are stored via a HashMap
    where labels are mapped to a key calculated by the following. The graph is
@@ -130,13 +124,33 @@ public class Graph {
     }
 
     public Graph prims(int start) {
-        // TODO: YOUR CODE HERE
-        return null;
+        Graph mst = new Graph();
+        PriorityQueue<Edge> fringe
+                = new PriorityQueue<>(Comparator.comparingInt(Edge::getWeight));
+        fringe.addAll(getEdges(start));
+        Edge shortest;
+        while (!fringe.isEmpty()) {
+            shortest = fringe.poll();
+            if (mst.containsVertex(shortest.getDest())) {
+                continue;
+            }
+            mst.addEdge(shortest);
+            fringe.addAll(getEdges(shortest.getDest()));
+        }
+        return mst;
     }
 
     public Graph kruskals() {
-        // TODO: YOUR CODE HERE
-        return null;
+        UnionFind uf = new UnionFind(getAllVertices().size());
+        TreeSet<Edge> edges = getAllEdges();
+        for (var e: edges) {
+            uf.union(e.getSource(), e.getDest());
+        }
+        Graph T = new Graph();
+        for (int i = 0; i < uf.items.length; ++i) {
+            T.addEdge(i, uf.items[i]);
+        }
+        return T;
     }
 
     /* Returns a randomly generated graph with VERTICES number of vertices and
