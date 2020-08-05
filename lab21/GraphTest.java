@@ -60,5 +60,11 @@ public class GraphTest {
         System.out.println("FROM DEMO K");
         System.out.println(tk.kruskals());
 
+        Graph tree = new Graph();
+        tree.addEdge(0, 1, 1);
+        tree.addEdge(0, 2, 2);
+        tree.addEdge(2, 3, 3);
+        System.out.println(tree.kruskals());
+
     }
 }

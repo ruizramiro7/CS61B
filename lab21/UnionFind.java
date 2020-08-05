@@ -61,11 +61,11 @@ public class UnionFind {
         }
         else if (sizeOf(r1) <= sizeOf(r2)) {
             items[r2] += items[r1];
-            items[r1] = r2;
+            items[v1] = v2;
         }
         else {
             items[r1] += items[r2];
-            items[r2] = r1;
+            items[v2] = v1;
         }
     }
 }
