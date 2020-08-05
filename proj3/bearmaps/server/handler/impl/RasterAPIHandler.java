@@ -94,15 +94,26 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
 
     /**
      * Calculates the longitudinal distance per pixel.
-     * @param lrl Lower left longitude
-     * @param ull Upper left longitude
-     * @param widthOfImage width of theimage (or box) in pixels
+     * @param lrlon Lower left longitude
+     * @param ullon Upper left longitude
+     * @param widthOfImage width of the image (or box) in pixels
      * @return a double representing the longitudinal distance per pixel (LonDPP)
      */
-    private double lonDPP(double lrl, double ull, double widthOfImage) {
-        return (lrl - ull)  / widthOfImage;
+    private double lonDPP(double lrlon, double ullon, double widthOfImage) {
+        return (lrlon - ullon)  / widthOfImage;
     }
 
+    /**
+     * Calculates the depth [0, 7] given the longitudinal distance per pixel.
+     * @param lonDPP The longitudinal distance per pixel
+     * @return an integer representing the minimum depth per LonDPP.
+     */
+    private int getDepth(double lonDPP) {
+        double num = (Constants.ROOT_LRLON - Constants.ROOT_ULLON)
+                / (double) Constants.TILE_SIZE / lonDPP;
+        int d = (int) Math.ceil(Math.log(num) / Math.log(2));
+        return Math.max(0, Math.min(d, 7));
+    }
 
     @Override
     protected Object buildJsonResponse(Map<String, Object> result) {
