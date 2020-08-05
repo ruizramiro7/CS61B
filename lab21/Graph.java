@@ -170,8 +170,12 @@ public class Graph {
         String result = "";
         for (var v: edges.keySet()) {
             result += v.toString() + ": ";
+            TreeSet connections = new TreeSet();
             for (var e: edges.get(v)) {
-                result += " " + e.getDest();
+                connections.add(e.getDest());
+            }
+            for (var s: connections) {
+                result += " " + s;
             }
             result += "\n";
         }
