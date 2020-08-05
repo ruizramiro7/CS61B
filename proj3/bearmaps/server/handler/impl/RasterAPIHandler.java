@@ -92,6 +92,18 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
         return results;
     }
 
+    /**
+     * Calculates the longitudinal distance per pixel.
+     * @param lrl Lower left longitude
+     * @param ull Upper left longitude
+     * @param widthOfImage width of theimage (or box) in pixels
+     * @return a double representing the longitudinal distance per pixel (LonDPP)
+     */
+    private double lonDPP(double lrl, double ull, double widthOfImage) {
+        return (lrl - ull)  / widthOfImage;
+    }
+
+
     @Override
     protected Object buildJsonResponse(Map<String, Object> result) {
         boolean rasterSuccess = validateRasteredImgParams(result);
