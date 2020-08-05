@@ -128,7 +128,7 @@ public class Graph {
     public Graph prims(int start) {
         Graph mst = new Graph();
         PriorityQueue<Edge> fringe
-                = new PriorityQueue<>(Comparator.comparingInt(Edge::getWeight));
+                = new PriorityQueue<>();
         fringe.addAll(getEdges(start));
         Edge shortest;
         while (!fringe.isEmpty()) {

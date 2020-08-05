@@ -22,6 +22,7 @@ public class GraphTest {
         System.out.println("NORMAL");
         Graph t3p = normal.prims(0);
         Graph t3k = normal.kruskals();
+        assertEquals(t3p, t3k);
 
         System.out.println("SOME DISJOINT");
         Graph t4p = someDisjoint.prims(0);
@@ -64,6 +65,7 @@ public class GraphTest {
         tree.addEdge(0, 2, 2);
         tree.addEdge(2, 3, 3);
         System.out.println(tree.kruskals());
+        assertEquals(tree.kruskals(), tree.prims(0));
 
     }
 }
