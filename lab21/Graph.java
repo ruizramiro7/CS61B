@@ -144,13 +144,31 @@ public class Graph {
         UnionFind uf = new UnionFind(getAllVertices().size());
         TreeSet<Edge> edges = getAllEdges();
         for (var e: edges) {
-            uf.union(e.getSource(), e.getDest());
+            if (!uf.connected(e.getSource(), e.getDest())) {
+                uf.union(e.getSource(), e.getDest());
+            }
         }
         Graph T = new Graph();
         for (int i = 0; i < uf.items.length; ++i) {
-            T.addEdge(i, uf.items[i]);
+            //System.out.println(i + " " + uf.items[i]);
+            if (uf.items[i] > 0) {
+                T.addEdge(uf.items[i], i);
+            }
         }
         return T;
+    }
+
+    @Override
+    public String toString() {
+        String result = "";
+        for (var v: edges.keySet()) {
+            result += v.toString() + ": ";
+            for (var e: edges.get(v)) {
+                result += " " + e.getDest();
+            }
+            result += "\n";
+        }
+        return result;
     }
 
     /* Returns a randomly generated graph with VERTICES number of vertices and

@@ -44,7 +44,7 @@ public class UnionFind {
         while (parent(curr) > 0) {
             curr = parent(curr);
         }
-        items[v] = curr;
+        //items[v] = curr;
         return curr;
     }
 
