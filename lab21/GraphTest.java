@@ -23,4 +23,12 @@ public class GraphTest {
         System.out.println(edge.poll());
         System.out.println(edge.poll());
     }
+
+    @Test
+    public void testKruskal(){
+        Graph test = Graph.loadFromText("inputs/graphTestNormal.in");
+        System.out.println(test.getAllVertices());
+        Graph kruskal = test.kruskals();
+
+    }
 }

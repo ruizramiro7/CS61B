@@ -1,4 +1,5 @@
 import com.sun.jdi.event.VMStartEvent;
+import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 import java.util.*;
 import java.nio.file.Files;
@@ -128,7 +129,6 @@ public class Graph {
 
     public Graph prims(int start) {
         Graph path = new Graph();
-        //path.addVertex(start);
         PriorityQueue<Edge> queueEdges = new PriorityQueue<>(Comparator.comparing(Edge::getWeight));
         queueEdges.addAll(getEdges(start));
         while (path.edges.size() <= this.getAllVertices().size() -1) {
@@ -139,25 +139,55 @@ public class Graph {
             }
             path.addEdge(shortest);
             queueEdges.addAll(getEdges(shortest.getDest()));
-//            if(path.isNeighbor(path.getAllVertices().last(), v2.getSource())) {
-//                    path.addEdge(queueEdges.peek());
-//                    path.addVertex(queueEdges.poll().getSource());
-//                }
-//                if (path.isNeighbor(path.getAllVertices().last(), queueEdges.peek().getDest())) {
-//                    path.addEdge(queueEdges.peek());
-//                    path.addVertex(queueEdges.poll().getSource());
-//                }else{
-//                    queueEdges.poll();
-//                }
             // TODO: YOUR CODE HERE
         }
         return path;
     }
 
     public Graph kruskals() {
+        Graph path = new Graph();
+        for (Integer v : this.getAllVertices()){
+            path.addVertex(v);
+        }
+        PriorityQueue<Edge> queueEdges = new PriorityQueue<>(Comparator.comparing(Edge::getWeight));
+        queueEdges.addAll(getAllEdges());
+        WeightedQuickUnionUF uf = new WeightedQuickUnionUF(getAllVertices().size());
+        for (var e: queueEdges){
+            if (!uf.connected(e.getSource(),e.getDest())){
+                uf.union(e.getSource(),e.getDest());
+                path.addEdge(e.getSource(), e.getDest());
+            }
+        }
+//        PriorityQueue<Edge> queueEdges = new PriorityQueue<>(Comparator.comparing(Edge::getWeight));
+//        queueEdges.addAll(getAllEdges());
+//        for (Edge e: getAllEdges()){
+//            int i = 0;
+//            Edge shortest;
+//            shortest = queueEdges.poll();
+//            //path.isNeighbor(shortest.getSource(),shortest.getDest())
+//            if (path.allEdges.contains(shortest.getDest())){
+//                i++;
+//                continue;
+//            }
+//            i++;
+//            path.addEdge(shortest);
+//        }
+//        while(path.allEdges.size() <= this.getAllVertices().size()-1){
+//            Edge shortest;
+//            shortest = queueEdges.poll();
+//            if (path.allEdges. .contains(shortest.getDest())){
+//                continue;
+//            }
+//            path.addEdge(shortest.getSource(), shortest.getDest());
+//        }
+
+
+
+
+
 
         // TODO: YOUR CODE HERE
-        return null;
+        return path;
     }
 
     /* Returns a randomly generated graph with VERTICES number of vertices and
