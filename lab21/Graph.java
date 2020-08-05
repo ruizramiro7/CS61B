@@ -152,7 +152,7 @@ public class Graph {
         for (int i = 0; i < uf.items.length; ++i) {
             //System.out.println(i + " " + uf.items[i]);
             if (uf.items[i] > 0) {
-                T.addEdge(uf.items[i], i);
+                T.addEdge(i, uf.items[i]);
             }
         }
         return T;
