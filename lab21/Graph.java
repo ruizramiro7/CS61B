@@ -1,3 +1,5 @@
+import edu.princeton.cs.algs4.WeightedQuickUnionUF;
+
 import java.util.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -141,18 +143,24 @@ public class Graph {
     }
 
     public Graph kruskals() {
-        UnionFind uf = new UnionFind(getAllVertices().size());
-        TreeSet<Edge> edges = getAllEdges();
-        for (var e: edges) {
+        WeightedQuickUnionUF uf = new WeightedQuickUnionUF(getAllVertices().size());
+        Graph T = new Graph();
+        for (var e: getAllEdges()) {
             if (!uf.connected(e.getSource(), e.getDest())) {
                 uf.union(e.getSource(), e.getDest());
+                T.addEdge(e.getSource(), e.getDest());
             }
         }
-        Graph T = new Graph();
-        for (int i = 0; i < uf.items.length; ++i) {
-            if (uf.items[i] >= 0) {
-                T.addEdge(uf.items[i], i);
-            }
+
+        //Graph T = new Graph();
+        //for (int i = 0; i < uf.items.length; ++i) {
+        //    if (uf.items[i] >= 0) {
+        //        T.addEdge(uf.items[i], i);
+        //    }
+        //}
+
+        for (var s: T.edges.values()) {
+            //Collections.sort(s);
         }
         return T;
     }
