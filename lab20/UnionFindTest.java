@@ -14,9 +14,13 @@ public class UnionFindTest {
     public void testUnion(){
         UnionFind test = new UnionFind(4);
         test.union(0,1);
+        System.out.println(test.parent(0));
+        System.out.println(test.parent(1));
         test.union(2,3);
         assertEquals(2,test.parent(3));
         assertEquals(-2, test.parent(2));
+        test.union(0,2);
+        System.out.println(test.parent(0));
     }
 
     @Test
