@@ -148,19 +148,8 @@ public class Graph {
         for (var e: getAllEdges()) {
             if (!uf.connected(e.getSource(), e.getDest())) {
                 uf.union(e.getSource(), e.getDest());
-                T.addEdge(e.getSource(), e.getDest());
+                T.addEdge(e);
             }
-        }
-
-        //Graph T = new Graph();
-        //for (int i = 0; i < uf.items.length; ++i) {
-        //    if (uf.items[i] >= 0) {
-        //        T.addEdge(uf.items[i], i);
-        //    }
-        //}
-
-        for (var s: T.edges.values()) {
-            //Collections.sort(s);
         }
         return T;
     }

@@ -22,7 +22,6 @@ public class GraphTest {
         System.out.println("NORMAL");
         Graph t3p = normal.prims(0);
         Graph t3k = normal.kruskals();
-        System.out.println(t3k);
 
         System.out.println("SOME DISJOINT");
         Graph t4p = someDisjoint.prims(0);
