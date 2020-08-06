@@ -84,11 +84,11 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
      */
     @Override
     public Map<String, Object> processRequest(Map<String, Double> requestParams, Response response) {
+        //if (!validateParams(requestParams)) {
+        //    System.out.println(requestParams.get("ullat") + " " + requestParams.get("lrlat"));
+        //    return queryFail();
+        //}
         Map<String, Object> results = new HashMap<>();
-        if (!validateParams(requestParams)) {
-            results.put("query_success", false);
-            return results;
-        }
         double userLonDPP = lonDPP(requestParams.get("lrlon"),
                                    requestParams.get("ullon"),
                                    requestParams.get("w"));
@@ -98,9 +98,9 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
 
         // Calculate the length of the sides of the raster box in units of tile size.
         int ullonUnit = (int) Math.max(0,    Math.floor((requestParams.get("ullon") - Constants.ROOT_ULLON) / tileSize));
-        int ullatUnit = (int) Math.max(0,    Math.floor((requestParams.get("ullat") - Constants.ROOT_ULLAT) / tileSize));
-        int lrlonUnit = (int) Math.min(maxL, Math.ceil( (requestParams.get("lrlon") - Constants.ROOT_LRLON) / tileSize));
-        int lrlatUnit = (int) Math.min(maxL, Math.ceil( (requestParams.get("lrlat") - Constants.ROOT_LRLAT) / tileSize));
+        int ullatUnit = (int) Math.max(0,    Math.floor(-1 * (requestParams.get("ullat") - Constants.ROOT_ULLAT) / tileSize));
+        int lrlonUnit = (int) Math.min(maxL, Math.ceil( (requestParams.get("lrlon") - Constants.ROOT_ULLON) / tileSize));
+        int lrlatUnit = (int) Math.min(maxL, Math.ceil( -1 * (requestParams.get("lrlat") - Constants.ROOT_ULLAT) / tileSize));
 
         results.put("render_grid", getRenderGrid(ullonUnit, ullatUnit, lrlonUnit, lrlatUnit, depth));
         // Convert back to lon/lat units.
@@ -115,20 +115,23 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
     }
 
     private boolean validateParams(Map<String, Double> params) {
+        //params.get("ullon") >= Constants.ROOT_ULLON &&
+        //        params.get("ullat") >= Constants.ROOT_ULLAT &&
+        //        params.get("lrlon") <= Constants.ROOT_LRLON &&
+        //        params.get("lrlat") <= Constants.ROOT_LRLAT;
         return
-            params.get("ullon") >= Constants.ROOT_ULLON &&
-            params.get("ullat") >= Constants.ROOT_ULLAT &&
-            params.get("lrlon") <= Constants.ROOT_LRLON &&
-            params.get("lrlat") <= Constants.ROOT_LRLAT;
+            params.get("ullon") < params.get("lrlon") &&
+            params.get("ullat") < params.get("lrlat");
     }
 
     private String[][] getRenderGrid(int ullon, int ullat, int lrlon, int lrlat, int depth) {
         int lonSize = lrlon - ullon;
         int latSize = lrlat - ullat;
         String[][] grid = new String[lonSize][latSize];
-        for (int lon = ullon; lon <= lrlon; ++lon) {
-            for (int lat = ullat; lat <= lrlat; ++lat) {
+        for (int lon = ullon; lon < lrlon; ++lon) {
+            for (int lat = ullat; lat < lrlat; ++lat) {
                 grid[lon][lat] = "d" + depth + "_x" + lat + "_y" + lon + ".png";
+                System.out.println(grid[lon][lat]);
             }
         }
         return grid;
