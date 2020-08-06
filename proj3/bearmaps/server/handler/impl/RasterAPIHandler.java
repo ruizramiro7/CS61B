@@ -84,12 +84,65 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
      */
     @Override
     public Map<String, Object> processRequest(Map<String, Double> requestParams, Response response) {
-        //System.out.println("yo, wanna know the parameters given by the web browser? They are:");
-        //System.out.println(requestParams);
         Map<String, Object> results = new HashMap<>();
-        System.out.println("Since you haven't implemented RasterAPIHandler.processRequest, nothing is displayed in "
-                + "your browser.");
+        if (!validateParams(requestParams)) {
+            results.put("query_success", false);
+            return results;
+        }
+        double userLonDPP = lonDPP(requestParams.get("lrlon"),
+                                   requestParams.get("ullon"),
+                                   requestParams.get("w"));
+        int depth = getDepth(userLonDPP);
+        int maxL = (int) Math.pow(2, depth);
+        double tileSize = getTileSize(depth);
+
+        // Calculate the length of the sides of the raster box in units of tile size.
+        int ullonUnit = (int) Math.max(0,    Math.floor((requestParams.get("ullon") - Constants.ROOT_ULLON) / tileSize));
+        int ullatUnit = (int) Math.max(0,    Math.floor((requestParams.get("ullat") - Constants.ROOT_ULLAT) / tileSize));
+        int lrlonUnit = (int) Math.min(maxL, Math.ceil( (requestParams.get("lrlon") - Constants.ROOT_LRLON) / tileSize));
+        int lrlatUnit = (int) Math.min(maxL, Math.ceil( (requestParams.get("lrlat") - Constants.ROOT_LRLAT) / tileSize));
+
+        results.put("render_grid", getRenderGrid(ullonUnit, ullatUnit, lrlonUnit, lrlatUnit, depth));
+        // Convert back to lon/lat units.
+        results.put("raster_ul_lon", (double) ullonUnit * tileSize + Constants.ROOT_ULLON);
+        results.put("raster_ul_lat", (double) ullatUnit * tileSize + Constants.ROOT_ULLAT);
+        results.put("raster_lr_lon", (double) lrlonUnit * tileSize + Constants.ROOT_LRLON);
+        results.put("raster_lr_lat", (double) lrlatUnit * tileSize + Constants.ROOT_LRLAT);
+        results.put("depth", depth);
+        results.put("query_success", true);
+
         return results;
+    }
+
+    private boolean validateParams(Map<String, Double> params) {
+        return
+            params.get("ullon") >= Constants.ROOT_ULLON &&
+            params.get("ullat") >= Constants.ROOT_ULLAT &&
+            params.get("lrlon") <= Constants.ROOT_LRLON &&
+            params.get("lrlat") <= Constants.ROOT_LRLAT;
+    }
+
+    private String[][] getRenderGrid(int ullon, int ullat, int lrlon, int lrlat, int depth) {
+        int lonSize = lrlon - ullon;
+        int latSize = lrlat - ullat;
+        String[][] grid = new String[lonSize][latSize];
+        for (int lon = ullon; lon <= lrlon; ++lon) {
+            for (int lat = ullat; lat <= lrlat; ++lat) {
+                grid[lon][lat] = "d" + depth + "_x" + lat + "_y" + lon + ".png";
+            }
+        }
+        return grid;
+    }
+
+    /**
+     * Calculates the longitudinal size of a tile given the zoom level.
+     * @param depth
+     * @return
+     */
+    private double getTileSize(int depth) {
+        double tileSize = (Constants.ROOT_LRLON - Constants.ROOT_ULLON)
+                / Math.pow(2, depth);
+        return tileSize;
     }
 
     /**
