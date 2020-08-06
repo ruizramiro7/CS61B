@@ -98,7 +98,15 @@ public class DLList<T extends Comparable<T>> {
     /* Inserts ITEM into this DLList such that the values of this DLList are in
        increasing order. */
     private void insertionSortHelper(T item) {
-        // TODO: YOUR CODE HERE
+        Node curr = sentinel;
+        while (curr.next != sentinel) {
+            if (curr.next.item.compareTo(item) > 0) {
+                curr.next = new Node(item, curr, curr.next);
+                return;
+            }
+            curr = curr.next;
+        }
+        addLast(item);
     }
 
     /* Returns a copy of this DLList sorted using selection sort. Does not
@@ -127,8 +135,20 @@ public class DLList<T extends Comparable<T>> {
         }
         DLList<T> oneHalf = new DLList<>();
         DLList<T> otherHalf = new DLList<>();
-        // TODO: YOUR CODE HERE
-        return null;
+        Node curr = sentinel.next;
+        for (int i = 0; i < size; ++i) {
+            if (curr == sentinel) {
+                break;
+            }
+            else if (i < size / 2) {
+                oneHalf.addLast(curr.item);
+            }
+            else {
+                otherHalf.addLast(curr.item);
+            }
+            curr = curr.next;
+        }
+        return oneHalf.mergeSort().merge(otherHalf.mergeSort());
     }
 
     /* Returns the result of merging this DLList with LST. Does not modify the
@@ -168,8 +188,22 @@ public class DLList<T extends Comparable<T>> {
         DLList<T> equalElements = new DLList<>();
         DLList<T> largeElements = new DLList<>();
         T pivot = sentinel.next.item;
-        // TODO: YOUR CODE HERE
-        return null;
+        for (Node n = sentinel.next; n != sentinel; n = n.next) {
+            if (n.item.compareTo(pivot) > 0) {
+                largeElements.addLast(n.item);
+            }
+            else if (n.item.compareTo(pivot) < 0) {
+                smallElements.addLast(n.item);
+            }
+            else {
+                equalElements.addLast(n.item);
+            }
+        }
+        smallElements = smallElements.quicksort();
+        largeElements = largeElements.quicksort();
+        smallElements.append(equalElements);
+        smallElements.append(largeElements);
+        return smallElements;
     }
 
     /* Appends LST to the end of this DLList. */
