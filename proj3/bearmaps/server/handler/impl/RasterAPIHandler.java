@@ -84,76 +84,59 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
      */
     @Override
     public Map<String, Object> processRequest(Map<String, Double> requestParams, Response response) {
-        //if (!validateParams(requestParams)) {
-        //    System.out.println(requestParams.get("ullat") + " " + requestParams.get("lrlat"));
-        //    return queryFail();
-        //}
-
         double lrlon = requestParams.get("lrlon");
         double lrlat = requestParams.get("lrlat");
         double ullon = requestParams.get("ullon");
         double ullat = requestParams.get("ullat");
         double w = requestParams.get("w");
 
+        if (!validateParams(ullon, lrlon, ullat, lrlat)) {
+            return queryFail();
+        }
+
         Map<String, Object> results = new HashMap<>();
         double userLonDPP = lonDPP(lrlon, ullon, w);
         int depth = getDepth(userLonDPP);
-//        int maxL = (int) Math.pow(2, depth);
+        int maxL = (int) Math.pow(2, depth);
         double lonTileSize = getLonTileSize(depth);
         double latTileSize = getLatTileSize(depth);
 
-        if (!validateParams(requestParams) || lrlon < Constants.ROOT_LRLON
-                || lrlat > Constants.ROOT_LRLAT || ullon > Constants.ROOT_ULLON
-                || ullat < Constants.ROOT_ULLAT){
-            results.put("query_success", false);
-            return results;
-        }
-
         // Calculate the length of the sides of the raster box in units of tile size.
-        int ullonUnit = (int) Math.abs((ullon - Constants.ROOT_ULLON) / lonTileSize);
-        int ullatUnit = (int) Math.abs((ullat - Constants.ROOT_ULLAT) / latTileSize);
-        int lrlonUnit = (int) Math.abs((lrlon - Constants.ROOT_ULLON) / lonTileSize);
-        int lrlatUnit = (int) Math.abs((lrlat - Constants.ROOT_ULLAT) / latTileSize);
-
-        double rasteredUllon = Constants.ROOT_ULLON + ullonUnit * lonTileSize;
-        double rasteredUllat = Constants.ROOT_ULLAT - ullatUnit * latTileSize;
-        double rasteredLrlon = Constants.ROOT_ULLON + (lrlonUnit +1) * lonTileSize;
-        double rasteredLrlat = Constants.ROOT_ULLAT - (lrlatUnit + 1) * latTileSize;
-
-        results.put("render_grid", getRenderGrid(ullonUnit, ullatUnit, lrlonUnit, lrlatUnit, depth));
+        int ullonUnit = (int) Math.max(0,    Math.floor(     (ullon - Constants.ROOT_ULLON) / lonTileSize));
+        int ullatUnit = (int) Math.max(0,    Math.floor(-1 * (ullat - Constants.ROOT_ULLAT) / latTileSize));
+        int lrlonUnit = (int) Math.min(maxL, Math.ceil(      (lrlon - Constants.ROOT_ULLON) / lonTileSize));
+        int lrlatUnit = (int) Math.min(maxL, Math.ceil( -1 * (lrlat - Constants.ROOT_ULLAT) / latTileSize));
         // Convert back to lon/lat units.
-        results.put("raster_ul_lon", rasteredUllon);
-        results.put("raster_ul_lat", rasteredUllat);
-        results.put("raster_lr_lon", rasteredLrlon);
-        results.put("raster_lr_lat", rasteredLrlat);
-//        results.put("raster_ul_lon", (double) ullonUnit * lonTileSize + Constants.ROOT_ULLON);
-//        results.put("raster_ul_lat", (double) ullatUnit * latTileSize + Constants.ROOT_ULLAT);
-//        results.put("raster_lr_lon", (double) lrlonUnit * lonTileSize + Constants.ROOT_LRLON);
-//        results.put("raster_lr_lat", (double) lrlatUnit * latTileSize + Constants.ROOT_LRLAT);
+        double rasterUllon = Constants.ROOT_ULLON + ullonUnit * lonTileSize;
+        double rasterUllat = Constants.ROOT_ULLAT - ullatUnit * latTileSize;
+        double rasterLrlon = Constants.ROOT_ULLON + lrlonUnit * lonTileSize;
+        double rasterLrlat = Constants.ROOT_ULLAT - lrlatUnit * latTileSize;
+        // Set results
+        results.put("render_grid", getRenderGrid(ullonUnit, ullatUnit, lrlonUnit, lrlatUnit, depth));
+        results.put("raster_ul_lon", rasterUllon);
+        results.put("raster_ul_lat", rasterUllat);
+        results.put("raster_lr_lon", rasterLrlon);
+        results.put("raster_lr_lat", rasterLrlat);
         results.put("depth", depth);
         results.put("query_success", true);
 
         return results;
     }
 
-    private boolean validateParams(Map<String, Double> params) {
-        //params.get("ullon") >= Constants.ROOT_ULLON &&
-        //        params.get("ullat") >= Constants.ROOT_ULLAT &&
-        //        params.get("lrlon") <= Constants.ROOT_LRLON &&
-        //        params.get("lrlat") <= Constants.ROOT_LRLAT;
-        return
-            params.get("ullon") < params.get("lrlon") &&
-            params.get("ullat") < params.get("lrlat");
+    private boolean validateParams(double ullon, double lrlon, double ullat, double lrlat) {
+        boolean impossibleCoordinates = ullon > lrlon || lrlat > ullat;
+        boolean completelyOutsideMap = lrlat > Constants.ROOT_ULLAT || Constants.ROOT_LRLAT > ullat ||
+                                       lrlon < Constants.ROOT_ULLON || Constants.ROOT_LRLON < ullon;
+        return !impossibleCoordinates && !completelyOutsideMap;
     }
 
     private String[][] getRenderGrid(int ullon, int ullat, int lrlon, int lrlat, int depth) {
         int lonSize = lrlon - ullon;
         int latSize = lrlat - ullat;
-        String[][] grid = new String[lonSize +1][latSize+ 1];
-        for (int i = 0; i < lrlat - ullat; ++i) {
-            for (int j = ullat; j < lrlon - ullon; ++j) {
+        String[][] grid = new String[latSize][lonSize];
+        for (int i = 0; i < latSize; ++i) {
+            for (int j = 0; j < lonSize; ++j) {
                 grid[i][j] = "d" + depth + "_x" + (j + ullon) + "_y" + (i + ullat) + ".png";
-                System.out.println(grid[i][j]);
             }
         }
         return grid;
@@ -175,7 +158,6 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
         return tileSize;
     }
 
-
     /**
      * Calculates the longitudinal distance per pixel.
      * @param lrlon Lower left longitude
@@ -193,17 +175,10 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
      * @return an integer representing the minimum depth per LonDPP.
      */
     private int getDepth(double lonDPP) {
-        double mapLonDPP = (Constants.ROOT_LRLON - Constants.ROOT_ULLON) /Constants.TILE_SIZE;
-        int d = 0;
-        while (mapLonDPP > lonDPP && d < 7){
-            d++;
-            mapLonDPP = mapLonDPP /2;
-        }
-        return d;
-//        double num = (Constants.ROOT_LRLON - Constants.ROOT_ULLON)
-//                / (double) Constants.TILE_SIZE / lonDPP;
-//        int d = (int) Math.ceil(Math.log(num) / Math.log(2));
-//        return Math.max(0, Math.min(d, 7));
+        double num = (Constants.ROOT_LRLON - Constants.ROOT_ULLON)
+                / (double) Constants.TILE_SIZE / lonDPP;
+        int d = (int) Math.ceil(Math.log(num) / Math.log(2));
+        return Math.max(0, Math.min(d, 7));
     }
 
     @Override
