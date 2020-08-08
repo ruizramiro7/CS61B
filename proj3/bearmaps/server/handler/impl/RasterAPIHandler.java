@@ -101,7 +101,7 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
         double lonTileSize = getLonTileSize(depth);
         double latTileSize = getLatTileSize(depth);
 
-        // Calculate the length of the sides of the raster box in units of tile size.
+        // Calculate the length of the sides of the raster box in integer units of tile size and clamp to map.
         int ullonUnit = (int) Math.max(0,    Math.floor(     (ullon - Constants.ROOT_ULLON) / lonTileSize));
         int ullatUnit = (int) Math.max(0,    Math.floor(-1 * (ullat - Constants.ROOT_ULLAT) / latTileSize));
         int lrlonUnit = (int) Math.min(maxL, Math.ceil(      (lrlon - Constants.ROOT_ULLON) / lonTileSize));
@@ -178,7 +178,11 @@ public class RasterAPIHandler extends APIRouteHandler<Map<String, Double>, Map<S
         double num = (Constants.ROOT_LRLON - Constants.ROOT_ULLON)
                 / (double) Constants.TILE_SIZE / lonDPP;
         int d = (int) Math.ceil(Math.log(num) / Math.log(2));
-        return Math.max(0, Math.min(d, 7));
+        return clamp(d, 0, 7);
+    }
+
+    private int clamp(int value, int lower, int upper) {
+        return Math.max(lower, Math.min(value, upper));
     }
 
     @Override
