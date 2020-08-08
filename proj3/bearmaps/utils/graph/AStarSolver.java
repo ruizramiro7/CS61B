@@ -2,9 +2,7 @@ package bearmaps.utils.graph;
 import bearmaps.utils.pq.NaiveMinPQ;
 import jdk.jshell.spi.ExecutionControl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
 
@@ -17,7 +15,7 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
     NaiveMinPQ<Vertex> PQ = new NaiveMinPQ<>();
     HashMap<Vertex, Double> distTo = new HashMap<>();
     HashMap<Vertex, Vertex> prev = new HashMap<>();
-    List<Vertex> solution = new ArrayList<>();
+    LinkedList<Vertex> solution = new LinkedList<>();
     SolverOutcome outcome;
     int numStatesExplored = 1;
 
@@ -26,7 +24,7 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
         startTime = System.currentTimeMillis();
         endTime = startTime + timeout * 100.;
         PQ.insert(start, h(start, end));
-        distTo.replace(start, 0.);
+        distTo.put(start, 0.);
 
         Vertex p;
         while (!PQ.peek().equals(end)) {
@@ -52,7 +50,7 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
     private void buildSolution() {
         Vertex curr = goal;
         while (curr != null) {
-            solution.add(curr);
+            solution.addFirst(curr);
             curr = prev.get(curr);
         }
         outcome = SolverOutcome.SOLVED;
@@ -72,8 +70,8 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
         Vertex q = e.to();
         double w = e.weight();
         if (distTo.get(q) == null || distTo.get(p) + w < distTo.get(q)) {
-            distTo.replace(q, distTo.get(p) + w);
-            prev.replace(q, p);
+            distTo.put(q, distTo.get(p) + w);
+            prev.put(q, p);
             if (PQ.contains(q)) {
                 PQ.changePriority(q, distTo.get(q) + h(q, goal));
             }
