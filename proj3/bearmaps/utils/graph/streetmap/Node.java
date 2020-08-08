@@ -12,7 +12,7 @@ public class Node {
 
     private String name;
 
-    private Node(long id, double lat, double lon) {
+    public Node(long id, double lat, double lon) {
         this.id = id;
         this.lat = lat;
         this.lon = lon;
