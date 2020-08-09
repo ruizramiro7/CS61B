@@ -39,7 +39,7 @@ public class MinHeapPQ<T> implements PriorityQueue<T> {
     public void changePriority(T item, double priorityValue) {
         contains(item);
         PriorityItem change = new PriorityItem(item, priorityValue);
-        heap.changePriority(change, change.priorityValue);
+        heap.update(change);
         // TODO: YOUR CODE HERE
     }
 
