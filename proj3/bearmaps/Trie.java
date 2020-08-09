@@ -1,5 +1,6 @@
 package bearmaps;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 /**
@@ -18,27 +19,21 @@ public class Trie {
         t.add("samite", "Sam1te");
         t.add("samson", "Sam$on");
         t.add("alexander");
-        for (var s: t.keysWithPrefix("sam")) {
-            System.out.print(s + " ");
-        }
-        System.out.println("");
-        for (var s: t.keysWithPrefix("san")) {
-            System.out.print(s + " ");
-        }
-        System.out.println("");
-        for (var s: t.keysWithPrefix("al")) {
-            System.out.print(s + " ");
-        }
-        System.out.println("");
-        for (var s: t.keysWithPrefix("ni")) {
+        t.add(cleanString("Farley's on 65th"), "Farley's on 65th");
+        for (var s: t.keysWithPrefix("fa")) {
             System.out.print(s + " ");
         }
         System.out.println("");
     }
 
+    private static String cleanString(String s) {
+        return s.replaceAll("[^a-zA-Z ]", "").toLowerCase();
+    }
+
     private class TrieNode {
         private Character character;
-        private LinkedList<String> words = new LinkedList<>();
+        //private LinkedList<String> words = new LinkedList<>();
+        private HashSet<String> words = new HashSet<>();
         private boolean isEnd;
         private HashMap<Character, TrieNode> children = new HashMap<>();
 

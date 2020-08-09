@@ -37,11 +37,19 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
             p = new Point(x, y);
             nodes.put(p, n);
             points.add(p);
-            if (n.name() != null) {
-                names.add(cleanString(n.name()), n.name());
-            }
         }
         kdtree = new NaivePointSet(points);
+
+        for (var n: this.getAllNodes()) {
+            if (n.name() != null) {
+                if (cleanString(n.name()).equals("")) {
+                    names.add("0", n.name());
+                }
+                else {
+                    names.add(cleanString(n.name()), n.name());
+                }
+            }
+        }
     }
 
     /**
@@ -97,6 +105,9 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
      * cleaned <code>prefix</code>.
      */
     public List<String> getLocationsByPrefix(String prefix) {
+        if (cleanString(prefix).equals("")) {
+            return names.keysWithPrefix("0");
+        }
         return names.keysWithPrefix(cleanString(prefix));
     }
 
