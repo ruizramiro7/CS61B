@@ -40,16 +40,16 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
         }
         kdtree = new NaivePointSet(points);
 
-        for (var n: this.getAllNodes()) {
-            if (n.name() != null) {
-                if (cleanString(n.name()).equals("")) {
-                    names.add("0", n.name());
-                }
-                else {
-                    names.add(cleanString(n.name()), n.name());
-                }
-            }
-        }
+        //for (var n: this.getAllNodes()) {
+        //    if (n.name() != null) {
+        //        if (cleanString(n.name()).equals("")) {
+        //            names.add("0", n.name());
+        //        }
+        //        else {
+        //            names.add(cleanString(n.name()), n.name());
+        //        }
+        //    }
+        //}
     }
 
     /**

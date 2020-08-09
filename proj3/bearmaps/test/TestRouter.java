@@ -32,9 +32,6 @@ public class TestRouter {
         }
         graph = new AugmentedStreetMapGraph(OSM_DB_PATH);
         initialized = true;
-        String prefix = "76";
-        System.out.println("Getting prefixes for " + prefix);
-        System.out.println(graph.getLocationsByPrefix(prefix));
     }
 
     @Test
