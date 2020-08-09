@@ -171,7 +171,7 @@ public class MinHeap<E extends Comparable<E>> {
             throw new NoSuchElementException("MinHeap is Empty, can't remove min.");
         }
         E smallest = getElement(1);
-        swap(1, size()-1);
+        swap(1, size());
         contents.remove(size());
         hash.remove(smallest);
         tracker.remove(smallest);

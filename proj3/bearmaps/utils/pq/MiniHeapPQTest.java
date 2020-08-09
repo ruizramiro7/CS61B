@@ -2,6 +2,8 @@ package bearmaps.utils.pq;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.assertEquals;
 
 public class MiniHeapPQTest {
@@ -67,6 +69,15 @@ public class MiniHeapPQTest {
         System.out.println(min.peek());
         System.out.println(naive.peek());
         assertEquals(min.poll(), naive.poll());
+        System.out.println(min.toString());
+        System.out.println(naive.toString());
+        int i =0;
+        int[] test = new int[min.size()];
+        while (min.size()!= 0){
+            test[i] = min.poll();
+            i++;
+        }
+        System.out.println(Arrays.toString(test));
     }
 
 }
