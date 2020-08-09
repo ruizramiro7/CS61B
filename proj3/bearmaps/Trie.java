@@ -8,31 +8,8 @@ import java.util.LinkedList;
  */
 public class Trie {
 
-    public static void main(String... args) {
-        Trie t = new Trie();
-        t.add("sam", "Sam");
-        t.add("sam", "SAM");
-        t.add("samuel", "Samuel22");
-        t.add("samantha", "Samantha");
-        t.add("san jose", "San&Jose");
-        t.add("san angelo", "SANangElo");
-        t.add("samite", "Sam1te");
-        t.add("samson", "Sam$on");
-        t.add("alexander");
-        t.add(cleanString("Farley's on 65th"), "Farley's on 65th");
-        for (var s: t.keysWithPrefix("fa")) {
-            System.out.print(s + " ");
-        }
-        System.out.println("");
-    }
-
-    private static String cleanString(String s) {
-        return s.replaceAll("[^a-zA-Z ]", "").toLowerCase();
-    }
-
     private class TrieNode {
         private Character character;
-        //private LinkedList<String> words = new LinkedList<>();
         private HashSet<String> words = new HashSet<>();
         private boolean isEnd;
         private HashMap<Character, TrieNode> children = new HashMap<>();
