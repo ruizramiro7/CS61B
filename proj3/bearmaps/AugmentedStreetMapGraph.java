@@ -29,6 +29,7 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
         // List<Node> nodes = this.getNodes();
         ArrayList<Point> points = new ArrayList<>();
         nodes = new HashMap<>();
+        names = new Trie();
         Point p; double x; double y;
         for (var n: this.getNodes()) {
             x = projectToX(n.lon(), n.lat());
