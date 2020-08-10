@@ -32,16 +32,16 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
                 outcome = SolverOutcome.TIMEOUT;
                 return;
             }
-            else if (PQ.size() <= 0) {
-                outcome = SolverOutcome.UNSOLVABLE;
-                return;
-            }
             else {
                 p = PQ.poll();
                 numStatesExplored += 1;
                 for (var e: graph.neighbors(p)) {
                     relax(e);
                 }
+            }
+            if (PQ.size() <= 0) {
+                outcome = SolverOutcome.UNSOLVABLE;
+                return;
             }
         }
         buildSolution();
