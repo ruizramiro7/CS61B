@@ -22,6 +22,7 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
     HashMap<Point, Node> nodes;
     NaivePointSet kdtree;
     Trie names;
+    HashMap<String, List<Map<String, Object>>> locations;
 
     public AugmentedStreetMapGraph(String dbPath) {
         super(dbPath);
@@ -40,6 +41,7 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
         kdtree = new NaivePointSet(points);
 
         names = new Trie();
+        locations = new HashMap<>();
         for (var n: this.getAllNodes()) {
             if (n.name() != null) {
                 if (cleanString(n.name()).equals("")) {
@@ -48,9 +50,23 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
                 else {
                     names.add(cleanString(n.name()), n.name());
                 }
+                addLocation(n);
             }
         }
 
+    }
+
+    private void addLocation(Node n) {
+        String key = cleanString(n.name());
+        HashMap<String, Object> location = new HashMap<>();
+        location.put("lat", n.lat());
+        location.put("lon", n.lon());
+        location.put("name", n.name());
+        location.put("id", n.id());
+        if (!locations.containsKey(key)) {
+            locations.put(key, new ArrayList<>());
+        }
+        locations.get(key).add(location);
     }
 
     /**
@@ -126,7 +142,11 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
      * "id" -> Number, The id of the node. <br>
      */
     public List<Map<String, Object>> getLocations(String locationName) {
-        return new LinkedList<>();
+        List<Map<String, Object>> lst = locations.get(cleanString(locationName));
+        if (lst == null) {
+            return new ArrayList<>();
+        }
+        return lst;
     }
 
 

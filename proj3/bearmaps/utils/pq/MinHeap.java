@@ -57,9 +57,9 @@ public class MinHeap<E extends Comparable<E>> {
     /* Sets the element at index INDEX to ELEMENT. If the ArrayList is not big
        enough, add elements until it is the right size. */
     private void setElement(int index, E element) {
-        while (index >= contents.size()) {
-            contents.add(null);
-        }
+        //while (index >= contents.size()) {
+        //    contents.add(null);
+        //}
         contents.set(index, element);
     }
 
