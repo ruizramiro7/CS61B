@@ -35,11 +35,8 @@ public class MinHeap<E extends Comparable<E>> {
             return itemSet.get(item);
         }
         public void set(int index, E item) {
-            if (!items.get(index).equals(item)) {
-                itemSet.remove(items.get(index));
-                itemSet.put(item, index);
-            }
             items.put(index, item);
+            itemSet.put(item, index);
         }
         public void remove(int index) {
             itemSet.remove(items.get(index));
