@@ -8,22 +8,16 @@ import java.util.NoSuchElementException;
 /* A MinHeap class of Comparable elements backed by an ArrayList. */
 public class MinHeap<E extends Comparable<E>> {
 
-    public static void main(String... args) {
-        MinHeap<String> m = new MinHeap();
-        m.insert("test");
-    }
-
     private class ArrayMap {
         private HashMap<Integer, E> items;
-        private HashMap<E, Integer> itemSet;
-        //private HashSet<E> itemSet;
+        private HashSet<E> itemSet;
         public ArrayMap() {
             items = new HashMap<>();
-            itemSet = new HashMap<>();
+            itemSet = new HashSet<>();
         }
         public void add(E item) {
             items.put(items.size(), item);
-            itemSet.put(item, items.size());
+            itemSet.add(item);
         }
         public int size() {
             return items.size();
@@ -31,19 +25,19 @@ public class MinHeap<E extends Comparable<E>> {
         public E get(int index) {
             return items.get(index);
         }
-        public int getIndex(E item) {
-            return itemSet.get(item);
-        }
         public void set(int index, E item) {
+            if (!items.get(index).equals(item)) {
+                itemSet.remove(items.get(index));
+                itemSet.add(item);
+            }
             items.put(index, item);
-            itemSet.put(item, index);
         }
         public void remove(int index) {
             itemSet.remove(items.get(index));
             items.remove(index);
         }
         public boolean contains(E item) {
-            return itemSet.containsKey(item);
+            return itemSet.contains(item);
         }
     }
 
@@ -58,10 +52,6 @@ public class MinHeap<E extends Comparable<E>> {
     public MinHeap() {
         contents = new ArrayMap();
         contents.add(null);
-    }
-
-    private int getIndex(E element) {
-        return contents.getIndex(element);
     }
 
     /* Returns the element at index INDEX, and null if it is out of bounds. */
@@ -203,13 +193,16 @@ public class MinHeap<E extends Comparable<E>> {
        not exist in the MinHeap, throw a NoSuchElementException. Item equality
        should be checked using .equals(), not ==. */
     public void update(E element) {
-        if (!contains(element)) {
-            throw new NoSuchElementException();
+        for (int i = 1; i < contents.size(); ++i) {
+            if (getElement(i).equals(element)) {
+                setElement(i, element);
+                bubbleUp(i);
+                bubbleDown(i);
+                return;
+            }
         }
-        int index = getIndex(element);
-        setElement(index, element);
-        bubbleUp(index);
-        bubbleDown(index);
+        throw new NoSuchElementException();
+
     }
 
     /* Returns true if ELEMENT is contained in the MinHeap. Item equality should
