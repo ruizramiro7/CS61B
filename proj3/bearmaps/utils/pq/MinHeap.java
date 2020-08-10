@@ -2,6 +2,7 @@ package bearmaps.utils.pq;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 
 /* A MinHeap class of Comparable elements backed by an ArrayList. */
@@ -9,11 +10,14 @@ public class MinHeap<E extends Comparable<E>> {
 
     private class ArrayMap {
         private HashMap<Integer, E> items;
+        private HashSet<E> itemSet;
         public ArrayMap() {
             items = new HashMap<>();
+            itemSet = new HashSet<>();
         }
         public void add(E item) {
             items.put(items.size(), item);
+            itemSet.add(item);
         }
         public int size() {
             return items.size();
@@ -22,13 +26,18 @@ public class MinHeap<E extends Comparable<E>> {
             return items.get(index);
         }
         public void set(int index, E item) {
+            if (!items.get(index).equals(item)) {
+                itemSet.remove(items.get(index));
+                itemSet.add(item);
+            }
             items.put(index, item);
         }
         public void remove(int index) {
+            itemSet.remove(items.get(index));
             items.remove(index);
         }
         public boolean contains(E item) {
-            return items.containsValue(item);
+            return itemSet.contains(item);
         }
     }
 
