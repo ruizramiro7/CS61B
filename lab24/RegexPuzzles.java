@@ -27,7 +27,7 @@ public class RegexPuzzles {
 
     public static List<String> findStartupName(String[] names) {
         //String regex = "\\(.*?https?://(\\w+?\\.)+?[a-z]{2,3}/\\w+?\\.html.*?\\)";
-        String regex = "^((Data)|(App)|(my)|(on)|(un))[^i]*?((ly)|(sy)|(ify)|(\\.io)|(\\.fm)|(\\.tv))$";
+        String regex = "^((Data)|(App)|(my)|(on)|(un))[^i\\W]*?((ly)|(sy)|(ify)|(\\.io)|(\\.fm)|(\\.tv))$";
         Pattern namePattern = Pattern.compile(regex);
         List<String> validNames = new ArrayList<>();
         for (var name: names) {
