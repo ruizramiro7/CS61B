@@ -7,15 +7,41 @@ import java.util.NoSuchElementException;
 /* A MinHeap class of Comparable elements backed by an ArrayList. */
 public class MinHeap<E extends Comparable<E>> {
 
+    private class ArrayMap {
+        private HashMap<Integer, E> items;
+        public ArrayMap() {
+            items = new HashMap<>();
+        }
+        public void add(E item) {
+            items.put(items.size(), item);
+        }
+        public int size() {
+            return items.size();
+        }
+        public E get(int index) {
+            return items.get(index);
+        }
+        public void set(int index, E item) {
+            items.put(index, item);
+        }
+        public void remove(int index) {
+            items.remove(index);
+        }
+        public boolean contains(E item) {
+            return items.containsValue(item);
+        }
+    }
+
     /* An ArrayList that stores the elements in this MinHeap. */
-    private ArrayList<E> contents;
+    //private ArrayList<E> contents;
+    private ArrayMap contents;
     private int size;
     // TODO: YOUR CODE HERE (no code should be needed here if not
     // implementing the more optimized version)
 
     /* Initializes an empty MinHeap. */
     public MinHeap() {
-        contents = new ArrayList<>();
+        contents = new ArrayMap();
         contents.add(null);
     }
 
