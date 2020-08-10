@@ -21,6 +21,7 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
 
     HashMap<Point, Node> nodes;
     NaivePointSet kdtree;
+    Trie names;
 
     public AugmentedStreetMapGraph(String dbPath) {
         super(dbPath);
@@ -37,6 +38,19 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
             points.add(p);
         }
         kdtree = new NaivePointSet(points);
+
+        names = new Trie();
+        for (var n: this.getAllNodes()) {
+            if (n.name() != null) {
+                if (cleanString(n.name()).equals("")) {
+                    names.add("0", n.name());
+                }
+                else {
+                    names.add(cleanString(n.name()), n.name());
+                }
+            }
+        }
+
     }
 
     /**
@@ -92,7 +106,10 @@ public class AugmentedStreetMapGraph extends StreetMapGraph {
      * cleaned <code>prefix</code>.
      */
     public List<String> getLocationsByPrefix(String prefix) {
-        return new LinkedList<>();
+        if (cleanString(prefix).equals("")) {
+            return names.keysWithPrefix("0");
+        }
+        return names.keysWithPrefix(cleanString(prefix));
     }
 
     /**
