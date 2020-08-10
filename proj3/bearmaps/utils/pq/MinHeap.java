@@ -10,18 +10,13 @@ public class MinHeap<E extends Comparable<E>> {
     /* An ArrayList that stores the elements in this MinHeap. */
     private ArrayList<E> contents;
     private int size;
-    private HashMap<E, Double> hash;
-    private HashMap<E, Integer> tracker;
-    // TODO: YOUR CODE HERE (no code should be needed here if not 
+    // TODO: YOUR CODE HERE (no code should be needed here if not
     // implementing the more optimized version)
 
     /* Initializes an empty MinHeap. */
     public MinHeap() {
         contents = new ArrayList<>();
         contents.add(null);
-        hash = new HashMap<>();
-        tracker = new HashMap<>();
-        size = size();
     }
 
     /* Returns the element at index INDEX, and null if it is out of bounds. */
@@ -48,10 +43,7 @@ public class MinHeap<E extends Comparable<E>> {
         E element2 = getElement(index2);
         setElement(index2, element1);
         setElement(index1, element2);
-        tracker.put(contents.get(index2), index1);
-        tracker.put(contents.get(index1), index2);
     }
-
 
     /* Prints out the underlying heap sideways. Use for debugging. */
     @Override
@@ -82,20 +74,17 @@ public class MinHeap<E extends Comparable<E>> {
 
     /* Returns the index of the left child of the element at index INDEX. */
     private int getLeftOf(int index) {
-        // TODO: YOUR CODE HERE
-        return 2* index;
+        return 2 * index;
     }
 
     /* Returns the index of the right child of the element at index INDEX. */
     private int getRightOf(int index) {
-        // TODO: YOUR CODE HERE
-        return 2 * index +1;
+        return 2 * index + 1;
     }
 
     /* Returns the index of the parent of the element at index INDEX. */
     private int getParentOf(int index) {
-        // TODO: YOUR CODE HERE
-        return index /2;
+        return index / 2;
     }
 
     /* Returns the index of the smaller element. At least one index has a
@@ -103,78 +92,63 @@ public class MinHeap<E extends Comparable<E>> {
     private int min(int index1, int index2) {
         E element1 = getElement(index1);
         E element2 = getElement(index2);
-        if (element1 == null || element2 == null){
+        if (element1 == null || element2 == null) {
             return element1 == null ? index2 : index1;
         }
-        else if (element1.compareTo(element2) <= 0){
+        else if (element1.compareTo(element2) <= 0) {
             return index1;
         }
-        // TODO: YOUR CODE HERE
         return index2;
     }
 
     /* Returns but does not remove the smallest element in the MinHeap. */
     public E findMin() {
-        if (contents.size() == 0){
-            throw new NoSuchElementException("Empty");
-        }
-        // TODO: YOUR CODE HERE
-        return contents.get(1);
+        return getElement(1);
     }
 
     /* Bubbles up the element currently at index INDEX. */
     private void bubbleUp(int index) {
-        if (getParentOf(index) == 0|| min(index,getParentOf(index)) == getParentOf(index)){
+        int parentIndex = getParentOf(index);
+        if (parentIndex == 0 || min(index, parentIndex) == parentIndex) {
             return;
         }
-        swap(index, getParentOf(index));
-        bubbleUp(getParentOf(index));
-        // TODO: YOUR CODE HERE
+        swap(index, parentIndex);
+        bubbleUp(parentIndex);
     }
 
     /* Bubbles down the element currently at index INDEX. */
     private void bubbleDown(int index) {
-        if (getElement(getLeftOf(index)) == null){
+        if (getElement(getLeftOf(index)) == null) {
             return;
         }
         int minChild = min(getLeftOf(index), getRightOf(index));
-        if (min(minChild, index) == index){
+        if (min(minChild, index) == index) {
             return;
         }
         swap(index, minChild);
         bubbleDown(minChild);
     }
-        // TODO: YOUR CODE HERE
 
     /* Returns the number of elements in the MinHeap. */
     public int size() {
-        // TODO: YOUR CODE HERE
-        return contents.size() -1;
+        return contents.size() - 1;
     }
 
     /* Inserts ELEMENT into the MinHeap. If ELEMENT is already in the MinHeap,
        throw an IllegalArgumentException.*/
-    public void insert(E element, double priority) {
-        if (contains(element)){
-            throw new IllegalArgumentException("Already exist in MinHeap");
+    public void insert(E element) {
+        if (contains(element)) {
+            throw new IllegalArgumentException();
         }
-        hash.put(element,priority);
         contents.add(element);
         bubbleUp(size());
-        tracker.put(element, size());
-        // TODO: YOUR CODE HERE
     }
 
     /* Returns and removes the smallest element in the MinHeap. */
     public E removeMin() {
-        if (contents.size() == 0){
-            throw new NoSuchElementException("MinHeap is Empty, can't remove min.");
-        }
         E smallest = getElement(1);
         swap(1, size());
         contents.remove(size());
-        hash.remove(smallest);
-        tracker.remove(smallest);
         bubbleDown(1);
         return smallest;
     }
@@ -184,32 +158,22 @@ public class MinHeap<E extends Comparable<E>> {
        not exist in the MinHeap, throw a NoSuchElementException. Item equality
        should be checked using .equals(), not ==. */
     public void update(E element) {
-        for (int i =1; i < contents.size(); i++) {
-            if (getElement(i).equals(element)){
-                setElement(i ,element);
+        for (int i = 1; i < contents.size(); ++i) {
+            if (getElement(i).equals(element)) {
+                setElement(i, element);
                 bubbleUp(i);
                 bubbleDown(i);
+                return;
             }
         }
-        throw new NoSuchElementException("Element doesn't exist");
-        // TODO: YOUR CODE HERE
+        throw new NoSuchElementException();
+
     }
 
     /* Returns true if ELEMENT is contained in the MinHeap. Item equality should
        be checked using .equals(), not ==. */
     public boolean contains(E element) {
-        // TODO: YOUR CODE HERE
-        return hash.containsKey(element);
-    }
-
-
-    public void changePriority(E element, double priority){
-        if (!contains(element)){
-            throw new NoSuchElementException("Element doesn't exist");
-        }
-        int pos = tracker.get(element);
-        hash.put(element, priority);
-        bubbleDown(pos);
-        bubbleUp(pos);
+        return contents.contains(element);
     }
 }
+

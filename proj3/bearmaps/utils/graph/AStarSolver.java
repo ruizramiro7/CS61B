@@ -1,5 +1,5 @@
 package bearmaps.utils.graph;
-import bearmaps.utils.pq.NaiveMinPQ;
+import bearmaps.utils.pq.MinHeapPQ;
 import jdk.jshell.spi.ExecutionControl;
 
 import java.util.*;
@@ -12,7 +12,7 @@ public class AStarSolver<Vertex> implements ShortestPathsSolver<Vertex> {
     double startTime;
     double endTime;
     double currentTime;
-    NaiveMinPQ<Vertex> PQ = new NaiveMinPQ<>();
+    MinHeapPQ<Vertex> PQ = new MinHeapPQ<>();
     HashMap<Vertex, Double> distTo = new HashMap<>();
     HashMap<Vertex, Vertex> prev = new HashMap<>();
     LinkedList<Vertex> solution = new LinkedList<>();
